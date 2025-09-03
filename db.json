@@ -1,0 +1,2486 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "userId": 1
+    },
+    {
+      "id": 2,
+      "title": "json-server",
+      "userId": 2
+    }
+  ],
+  "articles": [
+    {
+      "id": "1",
+      "title": "Javascript news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://teknotower.com/wp-content/uploads/2020/11/js.png",
+      "views": 56,
+      "createdAt": "26.02.2024",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        },
+        {
+          "id": "4",
+          "type": "CODE",
+          "code": "<!DOCTYPE html>\n<html>\n  <body>\n    <p id=\"hello\"></p>\n\n    <script>\n      document.getElementById(\"hello\").innerHTML = \"Hello, world!\";\n    </script>\n  </body>\n</html>;"
+        },
+        {
+          "id": "5",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        },
+        {
+          "id": "2",
+          "type": "IMAGE",
+          "src": "https://hsto.org/r/w1560/getpro/habr/post_images/d56/a02/ffc/d56a02ffc62949b42904ca00c63d8cc1.png",
+          "title": "Рисунок 1 - скриншот сайта"
+        },
+        {
+          "id": "3",
+          "type": "CODE",
+          "code": "const path = require('path');\n\nconst server = jsonServer.create();\n\nconst router = jsonServer.router(path.resolve(__dirname, 'db.json'));\n\nserver.use(jsonServer.defaults({}));\nserver.use(jsonServer.bodyParser);"
+        },
+        {
+          "id": "7",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        },
+        {
+          "id": "8",
+          "type": "IMAGE",
+          "src": "https://hsto.org/r/w1560/getpro/habr/post_images/d56/a02/ffc/d56a02ffc62949b42904ca00c63d8cc1.png",
+          "title": "Рисунок 1 - скриншот сайта"
+        },
+        {
+          "id": "9",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Python news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://files.prepinsta.com/wp-content/uploads/2020/07/python-removebg-preview.webp",
+      "views": 1022,
+      "createdAt": "26.02.2023",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "Kotlin news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://miro.medium.com/v2/resize:fit:250/1*jA64NTovT-efZ96tcq-X5g.png",
+      "views": 543,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "Python news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://files.prepinsta.com/wp-content/uploads/2020/07/python-removebg-preview.webp",
+      "views": 32,
+      "createdAt": "29.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "title": "Mastering English Grammar",
+      "subtitle": "Essential Grammar Tips for English Learners",
+      "img": "/images/article1.jpg",
+      "views": 87,
+      "createdAt": "10.09.2024",
+      "userId": "1",
+      "type": [
+        "Education"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Introduction to English Grammar",
+          "paragraphs": [
+            "Understanding English grammar is crucial for mastering the language. Basic grammar rules, such as verb tenses, sentence structure, and punctuation, form the foundation of effective communication. Whether you are a beginner or looking to refine your skills, grasping these elements will enhance your writing and speaking abilities.",
+            "One important aspect of English grammar is the use of articles ('a', 'an', 'the'). These small words can change the meaning of a sentence significantly. For instance, 'a cat' refers to any cat, while 'the cat' refers to a specific one. Learning the rules for using articles correctly is essential for clear and precise communication."
+          ]
+        },
+        {
+          "id": "2",
+          "type": "IMAGE",
+          "src": "https://i.pinimg.com/564x/1a/2f/e0/1a2fe07b5115b747b9ea5ab99be9262d.jpg",
+          "title": "Grammar Example - Articles"
+        },
+        {
+          "id": "3",
+          "type": "TEXT",
+          "title": "Verb Tenses in English",
+          "paragraphs": [
+            "English verb tenses can be challenging to master due to their various forms and uses. The simple present tense, for example, is used to describe habitual actions or general truths, while the present continuous tense is used for actions happening right now. Understanding when and how to use each tense correctly is key to expressing time and aspect accurately."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "title": "Improving English Vocabulary",
+      "subtitle": "Tips and Tricks for Expanding Your Word Bank",
+      "img": "/images/article2.jpg",
+      "views": 920,
+      "createdAt": "11.09.2024",
+      "userId": "1",
+      "type": [
+        "Education"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Why Expanding Your Vocabulary Matters",
+          "paragraphs": [
+            "A rich vocabulary allows for more precise and varied expression in both written and spoken English. Expanding your vocabulary involves not just learning new words, but also understanding their connotations and contexts. This can significantly improve your communication skills and help you convey your ideas more effectively.",
+            "There are several strategies to enhance your vocabulary. Reading widely, using vocabulary apps, and engaging in regular practice can help. Additionally, keeping a personal vocabulary journal where you write down new words and their meanings can be a useful tool for retention."
+          ]
+        },
+        {
+          "id": "2",
+          "type": "IMAGE",
+          "src": "https://i.pinimg.com/564x/8d/cf/be/8dcfbeae235ee324964443865d3e8f1c.jpg",
+          "title": "Vocabulary Expansion Techniques"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "title": "English Pronunciation Tips",
+      "subtitle": "How to Improve Your Pronunciation Skills",
+      "img": "/images/article3.jpg",
+      "views": 780,
+      "createdAt": "12.09.2024",
+      "userId": "1",
+      "type": [
+        "Education"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "The Importance of Pronunciation",
+          "paragraphs": [
+            "Good pronunciation is essential for being understood clearly in English. It involves correct articulation of sounds, stress, and intonation. Mispronunciations can lead to misunderstandings, so it's important to focus on mastering the pronunciation of English sounds and words.",
+            "Practicing with native speakers, listening to English media, and using pronunciation tools can help. Additionally, paying attention to the rhythm and melody of English speech can aid in achieving natural-sounding pronunciation."
+          ]
+        },
+        {
+          "id": "2",
+          "type": "IMAGE",
+          "src": "https://example.com/pronunciation_example.png",
+          "title": "Pronunciation Practice Exercises"
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "title": "Effective English Writing Techniques",
+      "subtitle": "How to Write Clearly and Effectively in English",
+      "img": "/images/article4.jpg",
+      "views": 670,
+      "createdAt": "13.09.2024",
+      "userId": "1",
+      "type": [
+        "Education"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Writing with Clarity",
+          "paragraphs": [
+            "Writing clearly and effectively is a skill that can be developed with practice. Key techniques include organizing your ideas logically, using concise language, and varying your sentence structure. Additionally, proofreading your work and seeking feedback from others can help refine your writing.",
+            "One useful method is to outline your main points before writing. This can help ensure that your content is coherent and flows logically. Also, consider your audience and tailor your language and style to their needs."
+          ]
+        },
+        {
+          "id": "2",
+          "type": "IMAGE",
+          "src": "https://example.com/writing_example.png",
+          "title": "Writing Techniques and Tools"
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "title": "Learning English Through Conversation",
+      "subtitle": "How to Practice Speaking English Effectively",
+      "img": "/images/article5.jpg",
+      "views": 560,
+      "createdAt": "14.09.2024",
+      "userId": "1",
+      "type": [
+        "Education"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "The Benefits of Conversational Practice",
+          "paragraphs": [
+            "Engaging in conversation is one of the most effective ways to improve your English speaking skills. It helps you practice pronunciation, learn new vocabulary, and become more comfortable with the language. Regular conversation practice also helps build confidence and fluency.",
+            "To get the most out of conversational practice, seek opportunities to speak with native speakers or advanced learners. Language exchange programs, conversation clubs, and online platforms can provide valuable practice and feedback."
+          ]
+        },
+        {
+          "id": "2",
+          "type": "IMAGE",
+          "src": "https://example.com/conversation_example.png",
+          "title": "Conversation Practice Resources"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "title": "Python news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://files.prepinsta.com/wp-content/uploads/2020/07/python-removebg-preview.webp",
+      "views": 11,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "title": "Kotlin news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://miro.medium.com/v2/resize:fit:250/1*jA64NTovT-efZ96tcq-X5g.png",
+      "views": 876,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "title": "Python news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://files.prepinsta.com/wp-content/uploads/2020/07/python-removebg-preview.webp",
+      "views": 5,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "title": "Kotlin news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://miro.medium.com/v2/resize:fit:250/1*jA64NTovT-efZ96tcq-X5g.png",
+      "views": 756,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "title": "Python news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://files.prepinsta.com/wp-content/uploads/2020/07/python-removebg-preview.webp",
+      "views": 887,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "title": "Kotlin news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://miro.medium.com/v2/resize:fit:250/1*jA64NTovT-efZ96tcq-X5g.png",
+      "views": 765,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "title": "Python news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://files.prepinsta.com/wp-content/uploads/2020/07/python-removebg-preview.webp",
+      "views": 54,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "title": "Kotlin news",
+      "subtitle": "Что нового в JS за 2022 год?",
+      "img": "https://miro.medium.com/v2/resize:fit:250/1*jA64NTovT-efZ96tcq-X5g.png",
+      "views": 53,
+      "createdAt": "26.02.2022",
+      "userId": "1",
+      "type": [
+        "IT"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "title": "Заголовок этого блока",
+          "paragraphs": [
+            "Программа, которую по традиции называют «Hello, world!», очень проста. Она выводит куда-либо фразу «Hello, world!», или другую подобную, средствами некоего языка.",
+            "JavaScript — это язык, программы на котором можно выполнять в разных средах. В нашем случае речь идёт о браузерах и о серверной платформе Node.js. Если до сих пор вы не написали ни строчки кода на JS и читаете этот текст в браузере, на настольном компьютере, это значит, что вы буквально в считанных секундах от своей первой JavaScript-программы.",
+            "Существуют и другие способы запуска JS-кода в браузере. Так, если говорить об обычном использовании программ на JavaScript, они загружаются в браузер для обеспечения работы веб-страниц. Как правило, код оформляют в виде отдельных файлов с расширением .js, которые подключают к веб-страницам, но программный код можно включать и непосредственно в код страницы. Всё это делается с помощью тега <script>. Когда браузер обнаруживает такой код, он выполняет его. Подробности о теге script можно посмотреть на сайте w3school.com. В частности, рассмотрим пример, демонстрирующий работу с веб-страницей средствами JavaScript, приведённый на этом ресурсе. Этот пример можно запустить и средствами данного ресурса (ищите кнопку Try it Yourself), но мы поступим немного иначе. А именно, создадим в каком-нибудь текстовом редакторе (например — в VS Code или в Notepad++) новый файл, который назовём hello.html, и добавим в него следующий код:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "title": "Trump back in Pennsylvania, where polls show a tight race",
+      "subtitle": "Election 2024",
+      "img": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/T5O6HBT54FICRXQQV2YFVA5NNA.jpg&w=916",
+      "views": 4321,
+      "createdAt": "23.09.2024",
+      "userId": "1",
+      "type": [
+        "POLITICS"
+      ],
+      "blocks": [
+        {
+          "id": "1",
+          "type": "TEXT",
+          "paragraphs": [
+            "Former president Donald Trump is campaigning in Pennsylvania on Monday at a policy event in the afternoon and a rally at night. Both Trump and Vice President Kamala Harris are heavily targeting the battleground state, where recent polls have shown a tight race, as they envision paths to victory in the electoral college. Harris, who has no campaign events scheduled Monday, plans to return to the Keystone State on Wednesday before heading west later in the week."
+          ]
+        }
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "id": "1",
+      "text": "some comment",
+      "articleId": "1",
+      "userId": "1"
+    },
+    {
+      "id": "2",
+      "text": "some comment 2",
+      "articleId": "1",
+      "userId": "1"
+    },
+    {
+      "id": "3",
+      "text": "some comment 3",
+      "articleId": "1",
+      "userId": "1"
+    },
+    {
+      "articleId": "1",
+      "userId": 4,
+      "text": "cool",
+      "id": "9IXgOLP"
+    },
+    {
+      "articleId": "1",
+      "userId": 2,
+      "text": "awesome!!!",
+      "id": "AXEwE-P"
+    },
+    {
+      "articleId": "1",
+      "userId": 2,
+      "text": "fdsf",
+      "id": "0SR6PW9"
+    },
+    {
+      "articleId": "1",
+      "userId": 2,
+      "text": "he",
+      "id": "Lj06PJu"
+    },
+    {
+      "articleId": "1",
+      "userId": 2,
+      "text": "Great!!!!!!!!",
+      "id": "pDL641b"
+    },
+    {
+      "articleId": "1",
+      "userId": 1,
+      "text": "????",
+      "id": "60tJsuG"
+    },
+    {
+      "articleId": "6",
+      "userId": 1,
+      "text": "interesting",
+      "id": "JK0LT0R"
+    },
+    {
+      "articleId": "2",
+      "userId": 1,
+      "text": "0",
+      "id": "42ox6LB"
+    },
+    {
+      "articleId": "2",
+      "userId": 1,
+      "text": "null",
+      "id": "kXmxkTZ"
+    },
+    {
+      "articleId": "2",
+      "userId": 1,
+      "text": "0",
+      "id": "OaSY8DY"
+    },
+    {
+      "articleId": "2",
+      "userId": 1,
+      "text": "null",
+      "id": "HDjmLRx"
+    },
+    {
+      "articleId": "2",
+      "userId": 1,
+      "text": "0",
+      "id": "VNGQxmy"
+    },
+    {
+      "articleId": "2",
+      "userId": 1,
+      "text": "0",
+      "id": "_UjCwSr"
+    },
+    {
+      "exerciseId": "1",
+      "userId": "1",
+      "selectedAnswer": "F",
+      "id": "uGDkyL7"
+    },
+    {
+      "articleId": "5",
+      "userId": 1,
+      "text": "cool!!!!!11",
+      "id": "49dmEhZ"
+    },
+    {
+      "articleId": "6",
+      "userId": 1,
+      "text": "!!!",
+      "id": "D0Vp87Z"
+    },
+    {
+      "articleId": "5",
+      "userId": 1,
+      "text": "meh",
+      "id": "2Befku3"
+    },
+    {
+      "articleId": "5",
+      "userId": 4,
+      "text": "great",
+      "id": "RtYG01T"
+    },
+    {
+      "articleId": "5",
+      "userId": 4,
+      "text": "qwe",
+      "id": "gbIcwf7"
+    },
+    {
+      "articleId": "5",
+      "userId": 1,
+      "text": "testing",
+      "id": "t5gLzC-"
+    },
+    {
+      "articleId": "5",
+      "userId": 9,
+      "text": "hm",
+      "id": "rt2FJdI"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "123",
+      "email": "test@gmail.com",
+      "avatar": "https://i.kym-cdn.com/entries/icons/facebook/000/041/063/cover1.jpg"
+    },
+    {
+      "id": 2,
+      "username": "newuser",
+      "password": "password123",
+      "email": "newuser@example.com",
+      "avatar": "https://i.redd.it/tiny-butcher-pt-2-oi-v0-uum6s87tn7891.jpg?width=1080&format=pjpg&auto=webp&s=04845a4a571b4388a35d44bc860d79d5ab6fdffd"
+    },
+    {
+      "id": 3,
+      "username": "newuser2",
+      "password": "password123",
+      "email": "newuser2@example.com"
+    },
+    {
+      "id": 4,
+      "username": "igor",
+      "password": "igor",
+      "email": "igor@gmail.com"
+    },
+    {
+      "id": 5,
+      "username": "katarina",
+      "password": "test",
+      "email": "test"
+    },
+    {
+      "id": 6,
+      "username": "Ben",
+      "password": "test456",
+      "email": "ben@gmail.com"
+    },
+    {
+      "id": 7,
+      "username": "butcher",
+      "password": "oi oi",
+      "email": "buthcer@gmail.com"
+    },
+    {
+      "id": 8,
+      "username": "cat",
+      "password": "cat",
+      "email": "cat@gmail.com"
+    },
+    {
+      "id": 9,
+      "username": "asd",
+      "password": "asdasd",
+      "email": "asd@gmail.com",
+      "avatar": "https://i.pravatar.cc/150?u=asd"
+    },
+    {
+      "id": 10,
+      "username": "zxc",
+      "password": "zxc123",
+      "email": "zxc@zxc.com",
+      "avatar": "https://picsum.photos/300?random=0.7476354396193419"
+    }
+  ],
+  "profile": [
+    {
+      "id": "1",
+      "name": "Igorr",
+      "lastName": "Korolyov",
+      "age": 25,
+      "currency": "USD",
+      "country": "FRANCE",
+      "city": "Minsk",
+      "username": "admin",
+      "avatar": "https://i.scdn.co/image/ab6761860000101623f740d8024b6e88db9d7eb8",
+      "primaryColor": "#F0B8C8",
+      "secondaryColor": "#d999ab"
+    },
+    {
+      "id": "2",
+      "name": "Ivan",
+      "lastName": "Vankov",
+      "age": 45,
+      "currency": "INR",
+      "country": "Russia",
+      "city": "Omsk",
+      "username": "newuser",
+      "avatar": "https://i.scdn.co/image/ab67618600001016e247e5170e8124049ec39b10",
+      "primaryColor": "#F8E8E8",
+      "secondaryColor": "#c8b0b0"
+    },
+    {
+      "id": "3",
+      "name": "Ben",
+      "lastName": "Vankov",
+      "age": 20,
+      "currency": "USD",
+      "country": "USA",
+      "city": "New York",
+      "username": "newuser2",
+      "avatar": "https://i.scdn.co/image/ab6761860000101640e92f1410df729961fe3702",
+      "primaryColor": "#D0D0B0",
+      "secondaryColor": "#7d7d63"
+    },
+    {
+      "id": "4",
+      "name": "Nick",
+      "lastName": "Kenty",
+      "age": 32,
+      "currency": "USD",
+      "country": "USA",
+      "city": "New York",
+      "username": "igor",
+      "avatar": "https://i.scdn.co/image/ab67618600001016ed11149d297f17fe1bdefb02",
+      "primaryColor": "#C8D0F0",
+      "secondaryColor": "#979fbf"
+    },
+    {
+      "id": "9",
+      "name": "",
+      "lastName": "",
+      "age": null,
+      "currency": "USD",
+      "country": "",
+      "city": "",
+      "username": "asd",
+      "avatar": "https://i.pravatar.cc/150?u=asd"
+    },
+    {
+      "id": "10",
+      "name": "adel",
+      "lastName": "adel",
+      "age": 18,
+      "currency": "USD",
+      "country": "FRANCE",
+      "city": "London",
+      "username": "vpn",
+      "avatar": "http://localhost:8000/uploads/1756831209462.jpg",
+      "avatarFile": {}
+    }
+  ],
+  "exercises": [
+    {
+      "id": 1,
+      "progressPercentage": 20,
+      "name": "Have - auxiliary or main verb",
+      "topic": "grammar",
+      "type": [
+        "ADVANCED"
+      ],
+      "image": "/images/image3.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which of the following sentences is grammatically correct?",
+          "correctAnswer": "She has been studying English for three years.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She has study English for three years.",
+              "type": "radio",
+              "value": "She has study English for three years."
+            },
+            {
+              "id": "2",
+              "label": "B. She has been studying English for three years.",
+              "type": "radio",
+              "value": "She has been studying English for three years."
+            },
+            {
+              "id": "3",
+              "label": "C. She studies English for three years.",
+              "type": "radio",
+              "value": "She studies English for three years."
+            },
+            {
+              "id": "4",
+              "label": "D. She has been study English for three years.",
+              "type": "radio",
+              "value": "She has been study English for three years."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which sentence is in the passive voice?",
+          "correctAnswer": "The book was written by George Orwell.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. George Orwell wrote the book.",
+              "type": "radio",
+              "value": "George Orwell wrote the book."
+            },
+            {
+              "id": "2",
+              "label": "B. The book is writing by George Orwell.",
+              "type": "radio",
+              "value": "The book is writing by George Orwell."
+            },
+            {
+              "id": "3",
+              "label": "C. The book was written by George Orwell.",
+              "type": "radio",
+              "value": "The book was written by George Orwell."
+            },
+            {
+              "id": "4",
+              "label": "D. George Orwell has written the book.",
+              "type": "radio",
+              "value": "George Orwell has written the book."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which of the following sentences uses the correct form of the verb?",
+          "correctAnswer": "They have gone to the store.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. They gone to the store.",
+              "type": "radio",
+              "value": "They gone to the store."
+            },
+            {
+              "id": "2",
+              "label": "B. They have gone to the store.",
+              "type": "radio",
+              "value": "They have gone to the store."
+            },
+            {
+              "id": "3",
+              "label": "C. They has gone to the store.",
+              "type": "radio",
+              "value": "They has gone to the store."
+            },
+            {
+              "id": "4",
+              "label": "D. They are gone to the store.",
+              "type": "radio",
+              "value": "They are gone to the store."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "question": "What is the correct past form of the verb 'to go'?",
+          "correctAnswer": "went",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. goed",
+              "type": "radio",
+              "value": "goed"
+            },
+            {
+              "id": "2",
+              "label": "B. gone",
+              "type": "radio",
+              "value": "gone"
+            },
+            {
+              "id": "3",
+              "label": "C. went",
+              "type": "radio",
+              "value": "went"
+            },
+            {
+              "id": "4",
+              "label": "D. goes",
+              "type": "radio",
+              "value": "goes"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "question": "Which sentence is in the future tense?",
+          "correctAnswer": "She will travel to Paris next year.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She travels to Paris next year.",
+              "type": "radio",
+              "value": "She travels to Paris next year."
+            },
+            {
+              "id": "2",
+              "label": "B. She travel to Paris next year.",
+              "type": "radio",
+              "value": "She travel to Paris next year."
+            },
+            {
+              "id": "3",
+              "label": "C. She will travel to Paris next year.",
+              "type": "radio",
+              "value": "She will travel to Paris next year."
+            },
+            {
+              "id": "4",
+              "label": "D. She traveled to Paris next year.",
+              "type": "radio",
+              "value": "She traveled to Paris next year."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "progressPercentage": 67,
+      "name": "Phrasal Verbs - Get",
+      "topic": "vocabulary",
+      "type": [
+        "ADVANCED"
+      ],
+      "image": "/images/image1.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which sentence correctly uses the phrasal verb 'get over'?",
+          "correctAnswer": "She took months to get over her illness.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She took months to get over her illness.",
+              "type": "radio",
+              "value": "She took months to get over her illness."
+            },
+            {
+              "id": "2",
+              "label": "B. She took months to get up her illness.",
+              "type": "radio",
+              "value": "She took months to get up her illness."
+            },
+            {
+              "id": "3",
+              "label": "C. She took months to get by her illness.",
+              "type": "radio",
+              "value": "She took months to get by her illness."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which phrasal verb means to manage with minimal resources?",
+          "correctAnswer": "get by",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. get over",
+              "type": "radio",
+              "value": "get over"
+            },
+            {
+              "id": "2",
+              "label": "B. get by",
+              "type": "radio",
+              "value": "get by"
+            },
+            {
+              "id": "3",
+              "label": "C. get up",
+              "type": "radio",
+              "value": "get up"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which phrasal verb means to avoid or escape responsibility?",
+          "correctAnswer": "get out of",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. get through",
+              "type": "radio",
+              "value": "get through"
+            },
+            {
+              "id": "2",
+              "label": "B. get by",
+              "type": "radio",
+              "value": "get by"
+            },
+            {
+              "id": "3",
+              "label": "C. get out of",
+              "type": "radio",
+              "value": "get out of"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "progressPercentage": 100,
+      "name": "Conditionals - If Clauses",
+      "topic": "grammar",
+      "type": [
+        "INTERMEDIATE"
+      ],
+      "image": "/images/image2.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which of these sentences is a correct zero conditional?",
+          "correctAnswer": "If water boils, it turns into steam.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. If water boils, it turns into steam.",
+              "type": "radio",
+              "value": "If water boils, it turns into steam."
+            },
+            {
+              "id": "2",
+              "label": "B. If water will boil, it turns into steam.",
+              "type": "radio",
+              "value": "If water will boil, it turns into steam."
+            },
+            {
+              "id": "3",
+              "label": "C. If water boiled, it would turn into steam.",
+              "type": "radio",
+              "value": "If water boiled, it would turn into steam."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which sentence is an example of a first conditional?",
+          "correctAnswer": "If it rains, we will stay indoors.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. If it rains, we will stay indoors.",
+              "type": "radio",
+              "value": "If it rains, we will stay indoors."
+            },
+            {
+              "id": "2",
+              "label": "B. If it rained, we would stay indoors.",
+              "type": "radio",
+              "value": "If it rained, we would stay indoors."
+            },
+            {
+              "id": "3",
+              "label": "C. If it rains, we would stay indoors.",
+              "type": "radio",
+              "value": "If it rains, we would stay indoors."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which sentence is an example of a second conditional?",
+          "correctAnswer": "If I had a car, I would drive to work.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. If I had a car, I would drive to work.",
+              "type": "radio",
+              "value": "If I had a car, I would drive to work."
+            },
+            {
+              "id": "2",
+              "label": "B. If I have a car, I will drive to work.",
+              "type": "radio",
+              "value": "If I have a car, I will drive to work."
+            },
+            {
+              "id": "3",
+              "label": "C. If I had a car, I drove to work.",
+              "type": "radio",
+              "value": "If I had a car, I drove to work."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "progressPercentage": 100,
+      "name": "Advanced Vocabulary - Synonyms",
+      "topic": "vocabulary",
+      "type": [
+        "ADVANCED"
+      ],
+      "image": "/images/image4.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which word is a synonym of 'elated'?",
+          "correctAnswer": "joyful",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. joyful",
+              "type": "radio",
+              "value": "joyful"
+            },
+            {
+              "id": "2",
+              "label": "B. angry",
+              "type": "radio",
+              "value": "angry"
+            },
+            {
+              "id": "3",
+              "label": "C. gloomy",
+              "type": "radio",
+              "value": "gloomy"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which word is a synonym of 'obstinate'?",
+          "correctAnswer": "stubborn",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. cooperative",
+              "type": "radio",
+              "value": "cooperative"
+            },
+            {
+              "id": "2",
+              "label": "B. stubborn",
+              "type": "radio",
+              "value": "stubborn"
+            },
+            {
+              "id": "3",
+              "label": "C. lazy",
+              "type": "radio",
+              "value": "lazy"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which word is a synonym of 'transient'?",
+          "correctAnswer": "temporary",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. permanent",
+              "type": "radio",
+              "value": "permanent"
+            },
+            {
+              "id": "2",
+              "label": "B. long-lasting",
+              "type": "radio",
+              "value": "long-lasting"
+            },
+            {
+              "id": "3",
+              "label": "C. temporary",
+              "type": "radio",
+              "value": "temporary"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "progressPercentage": 100,
+      "name": "Reported Speech",
+      "topic": "grammar",
+      "type": [
+        "INTERMEDIATE"
+      ],
+      "image": "/images/image5.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Convert the following sentence to reported speech: 'She said, \"I am studying hard.\"'",
+          "correctAnswer": "She said that she was studying hard.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She said that she was studying hard.",
+              "type": "radio",
+              "value": "She said that she was studying hard."
+            },
+            {
+              "id": "2",
+              "label": "B. She said that she is studying hard.",
+              "type": "radio",
+              "value": "She said that she is studying hard."
+            },
+            {
+              "id": "3",
+              "label": "C. She said that she had studied hard.",
+              "type": "radio",
+              "value": "She said that she had studied hard."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Convert the sentence to reported speech: 'He said, \"I will go tomorrow.\"'",
+          "correctAnswer": "He said that he would go the next day.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. He said that he will go the next day.",
+              "type": "radio",
+              "value": "He said that he will go the next day."
+            },
+            {
+              "id": "2",
+              "label": "B. He said that he would go the next day.",
+              "type": "radio",
+              "value": "He said that he would go the next day."
+            },
+            {
+              "id": "3",
+              "label": "C. He said that he goes tomorrow.",
+              "type": "radio",
+              "value": "He said that he goes tomorrow."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Convert the sentence to reported speech: 'They said, \"We saw him yesterday.\"'",
+          "correctAnswer": "They said that they had seen him the previous day.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. They said that they have seen him yesterday.",
+              "type": "radio",
+              "value": "They said that they have seen him yesterday."
+            },
+            {
+              "id": "2",
+              "label": "B. They said that they had seen him the previous day.",
+              "type": "radio",
+              "value": "They said that they had seen him the previous day."
+            },
+            {
+              "id": "3",
+              "label": "C. They said that they saw him the previous day.",
+              "type": "radio",
+              "value": "They said that they saw him the previous day."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "progressPercentage": 100,
+      "name": "Modal Verbs - Expressing Ability",
+      "topic": "grammar",
+      "type": [
+        "ADVANCED"
+      ],
+      "image": "/images/image6.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which sentence correctly uses a modal verb to express ability?",
+          "correctAnswer": "He can speak three languages.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. He can speak three languages.",
+              "type": "radio",
+              "value": "He can speak three languages."
+            },
+            {
+              "id": "2",
+              "label": "B. He must speak three languages.",
+              "type": "radio",
+              "value": "He must speak three languages."
+            },
+            {
+              "id": "3",
+              "label": "C. He should speak three languages.",
+              "type": "radio",
+              "value": "He should speak three languages."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which sentence correctly uses a modal verb to express possibility?",
+          "correctAnswer": "She might come to the party.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She might come to the party.",
+              "type": "radio",
+              "value": "She might come to the party."
+            },
+            {
+              "id": "2",
+              "label": "B. She should come to the party.",
+              "type": "radio",
+              "value": "She should come to the party."
+            },
+            {
+              "id": "3",
+              "label": "C. She must come to the party.",
+              "type": "radio",
+              "value": "She must come to the party."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which sentence correctly uses a modal verb to express obligation?",
+          "correctAnswer": "You must finish the assignment.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. You should finish the assignment.",
+              "type": "radio",
+              "value": "You should finish the assignment."
+            },
+            {
+              "id": "2",
+              "label": "B. You can finish the assignment.",
+              "type": "radio",
+              "value": "You can finish the assignment."
+            },
+            {
+              "id": "3",
+              "label": "C. You must finish the assignment.",
+              "type": "radio",
+              "value": "You must finish the assignment."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "progressPercentage": 40,
+      "name": "Adjectives vs Adverbs",
+      "topic": "grammar",
+      "type": [
+        "INTERMEDIATE"
+      ],
+      "image": "/images/image7.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Choose the correct word to complete the sentence: She sings ____.",
+          "correctAnswer": "beautifully",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. beautiful",
+              "type": "radio",
+              "value": "beautiful"
+            },
+            {
+              "id": "2",
+              "label": "B. beautifully",
+              "type": "radio",
+              "value": "beautifully"
+            },
+            {
+              "id": "3",
+              "label": "C. beauty",
+              "type": "radio",
+              "value": "beauty"
+            },
+            {
+              "id": "4",
+              "label": "D. beautify",
+              "type": "radio",
+              "value": "beautify"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Choose the correct word: He drives ____ than his sister.",
+          "correctAnswer": "more carefully",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. more carefully",
+              "type": "radio",
+              "value": "more carefully"
+            },
+            {
+              "id": "2",
+              "label": "B. careful",
+              "type": "radio",
+              "value": "careful"
+            },
+            {
+              "id": "3",
+              "label": "C. carefuler",
+              "type": "radio",
+              "value": "carefuler"
+            },
+            {
+              "id": "4",
+              "label": "D. most careful",
+              "type": "radio",
+              "value": "most careful"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which sentence is correct?",
+          "correctAnswer": "She worked hard to finish the project.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She worked hard to finish the project.",
+              "type": "radio",
+              "value": "She worked hard to finish the project."
+            },
+            {
+              "id": "2",
+              "label": "B. She worked hardly to finish the project.",
+              "type": "radio",
+              "value": "She worked hardly to finish the project."
+            },
+            {
+              "id": "3",
+              "label": "C. She works hardly to finish the project.",
+              "type": "radio",
+              "value": "She works hardly to finish the project."
+            },
+            {
+              "id": "4",
+              "label": "D. She working hard to finish the project.",
+              "type": "radio",
+              "value": "She working hard to finish the project."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "question": "Choose the correct form: She looked ____ at him.",
+          "correctAnswer": "angrily",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. angry",
+              "type": "radio",
+              "value": "angry"
+            },
+            {
+              "id": "2",
+              "label": "B. angrily",
+              "type": "radio",
+              "value": "angrily"
+            },
+            {
+              "id": "3",
+              "label": "C. anger",
+              "type": "radio",
+              "value": "anger"
+            },
+            {
+              "id": "4",
+              "label": "D. angered",
+              "type": "radio",
+              "value": "angered"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "question": "Select the correct option: The cat moved ____ across the room.",
+          "correctAnswer": "silently",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. silence",
+              "type": "radio",
+              "value": "silence"
+            },
+            {
+              "id": "2",
+              "label": "B. silent",
+              "type": "radio",
+              "value": "silent"
+            },
+            {
+              "id": "3",
+              "label": "C. silently",
+              "type": "radio",
+              "value": "silently"
+            },
+            {
+              "id": "4",
+              "label": "D. silented",
+              "type": "radio",
+              "value": "silented"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "progressPercentage": 100,
+      "name": "Past Simple vs Past Continuous",
+      "topic": "grammar",
+      "type": [
+        "INTERMEDIATE"
+      ],
+      "image": "/images/image8.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Choose the correct sentence:",
+          "correctAnswer": "I was watching TV when she called.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. I watched TV when she called.",
+              "type": "radio",
+              "value": "I watched TV when she called."
+            },
+            {
+              "id": "2",
+              "label": "B. I was watching TV when she called.",
+              "type": "radio",
+              "value": "I was watching TV when she called."
+            },
+            {
+              "id": "3",
+              "label": "C. I watch TV when she called.",
+              "type": "radio",
+              "value": "I watch TV when she called."
+            },
+            {
+              "id": "4",
+              "label": "D. I am watching TV when she called.",
+              "type": "radio",
+              "value": "I am watching TV when she called."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which sentence is correct?",
+          "correctAnswer": "They were playing football when it started to rain.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. They played football when it started to rain.",
+              "type": "radio",
+              "value": "They played football when it started to rain."
+            },
+            {
+              "id": "2",
+              "label": "B. They are playing football when it started to rain.",
+              "type": "radio",
+              "value": "They are playing football when it started to rain."
+            },
+            {
+              "id": "3",
+              "label": "C. They were playing football when it started to rain.",
+              "type": "radio",
+              "value": "They were playing football when it started to rain."
+            },
+            {
+              "id": "4",
+              "label": "D. They play football when it started to rain.",
+              "type": "radio",
+              "value": "They play football when it started to rain."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which sentence correctly uses the past continuous?",
+          "correctAnswer": "She was reading a book when he arrived.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She reads a book when he arrived.",
+              "type": "radio",
+              "value": "She reads a book when he arrived."
+            },
+            {
+              "id": "2",
+              "label": "B. She read a book when he arrived.",
+              "type": "radio",
+              "value": "She read a book when he arrived."
+            },
+            {
+              "id": "3",
+              "label": "C. She was reading a book when he arrived.",
+              "type": "radio",
+              "value": "She was reading a book when he arrived."
+            },
+            {
+              "id": "4",
+              "label": "D. She is reading a book when he arrived.",
+              "type": "radio",
+              "value": "She is reading a book when he arrived."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "question": "Complete the sentence: He ____ (study) when the phone rang.",
+          "correctAnswer": "was studying",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. studied",
+              "type": "radio",
+              "value": "studied"
+            },
+            {
+              "id": "2",
+              "label": "B. studies",
+              "type": "radio",
+              "value": "studies"
+            },
+            {
+              "id": "3",
+              "label": "C. was studying",
+              "type": "radio",
+              "value": "was studying"
+            },
+            {
+              "id": "4",
+              "label": "D. study",
+              "type": "radio",
+              "value": "study"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "question": "Choose the correct option: While I ____ (walk) home, I saw an accident.",
+          "correctAnswer": "was walking",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. walked",
+              "type": "radio",
+              "value": "walked"
+            },
+            {
+              "id": "2",
+              "label": "B. was walking",
+              "type": "radio",
+              "value": "was walking"
+            },
+            {
+              "id": "3",
+              "label": "C. walk",
+              "type": "radio",
+              "value": "walk"
+            },
+            {
+              "id": "4",
+              "label": "D. walking",
+              "type": "radio",
+              "value": "walking"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "progressPercentage": 20,
+      "name": "Present Perfect vs Past Simple",
+      "topic": "grammar",
+      "type": [
+        "INTERMEDIATE"
+      ],
+      "image": "/images/image9.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which sentence is correct?",
+          "correctAnswer": "I have already eaten breakfast.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. I already eat breakfast.",
+              "type": "radio",
+              "value": "I already eat breakfast."
+            },
+            {
+              "id": "2",
+              "label": "B. I already ate breakfast.",
+              "type": "radio",
+              "value": "I already ate breakfast."
+            },
+            {
+              "id": "3",
+              "label": "C. I have already eaten breakfast.",
+              "type": "radio",
+              "value": "I have already eaten breakfast."
+            },
+            {
+              "id": "4",
+              "label": "D. I am already eating breakfast.",
+              "type": "radio",
+              "value": "I am already eating breakfast."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Choose the correct sentence:",
+          "correctAnswer": "She has lived here since 2010.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She lives here since 2010.",
+              "type": "radio",
+              "value": "She lives here since 2010."
+            },
+            {
+              "id": "2",
+              "label": "B. She has lived here since 2010.",
+              "type": "radio",
+              "value": "She has lived here since 2010."
+            },
+            {
+              "id": "3",
+              "label": "C. She live here since 2010.",
+              "type": "radio",
+              "value": "She live here since 2010."
+            },
+            {
+              "id": "4",
+              "label": "D. She is living here since 2010.",
+              "type": "radio",
+              "value": "She is living here since 2010."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which sentence correctly uses the present perfect?",
+          "correctAnswer": "We have just arrived at the station.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. We just arrived at the station.",
+              "type": "radio",
+              "value": "We just arrived at the station."
+            },
+            {
+              "id": "2",
+              "label": "B. We have just arrived at the station.",
+              "type": "radio",
+              "value": "We have just arrived at the station."
+            },
+            {
+              "id": "3",
+              "label": "C. We just arrive at the station.",
+              "type": "radio",
+              "value": "We just arrive at the station."
+            },
+            {
+              "id": "4",
+              "label": "D. We have just arrive at the station.",
+              "type": "radio",
+              "value": "We have just arrive at the station."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "question": "Complete the sentence: He ____ (never see) a lion before.",
+          "correctAnswer": "has never seen",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. has never saw",
+              "type": "radio",
+              "value": "has never saw"
+            },
+            {
+              "id": "2",
+              "label": "B. never sees",
+              "type": "radio",
+              "value": "never sees"
+            },
+            {
+              "id": "3",
+              "label": "C. has never seen",
+              "type": "radio",
+              "value": "has never seen"
+            },
+            {
+              "id": "4",
+              "label": "D. never saw",
+              "type": "radio",
+              "value": "never saw"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "question": "Which sentence correctly uses the past simple?",
+          "correctAnswer": "They went to the concert last night.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. They have gone to the concert last night.",
+              "type": "radio",
+              "value": "They have gone to the concert last night."
+            },
+            {
+              "id": "2",
+              "label": "B. They go to the concert last night.",
+              "type": "radio",
+              "value": "They go to the concert last night."
+            },
+            {
+              "id": "3",
+              "label": "C. They went to the concert last night.",
+              "type": "radio",
+              "value": "They went to the concert last night."
+            },
+            {
+              "id": "4",
+              "label": "D. They have went to the concert last night.",
+              "type": "radio",
+              "value": "They have went to the concert last night."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "progressPercentage": 0,
+      "name": "test",
+      "topic": "grammar",
+      "type": [
+        "ADVANCED"
+      ],
+      "image": "/images/image3.jpg",
+      "questions": [
+        {
+          "id": 1,
+          "question": "Which of the following sentences is grammatically correct?",
+          "correctAnswer": "She has been studying English for three years.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She has study English for three years.",
+              "type": "radio",
+              "value": "She has study English for three years."
+            },
+            {
+              "id": "2",
+              "label": "B. She has been studying English for three years.",
+              "type": "radio",
+              "value": "She has been studying English for three years."
+            },
+            {
+              "id": "3",
+              "label": "C. She studies English for three years.",
+              "type": "radio",
+              "value": "She studies English for three years."
+            },
+            {
+              "id": "4",
+              "label": "D. She has been study English for three years.",
+              "type": "radio",
+              "value": "She has been study English for three years."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "question": "Which sentence is in the passive voice?",
+          "correctAnswer": "The book was written by George Orwell.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. George Orwell wrote the book.",
+              "type": "radio",
+              "value": "George Orwell wrote the book."
+            },
+            {
+              "id": "2",
+              "label": "B. The book is writing by George Orwell.",
+              "type": "radio",
+              "value": "The book is writing by George Orwell."
+            },
+            {
+              "id": "3",
+              "label": "C. The book was written by George Orwell.",
+              "type": "radio",
+              "value": "The book was written by George Orwell."
+            },
+            {
+              "id": "4",
+              "label": "D. George Orwell has written the book.",
+              "type": "radio",
+              "value": "George Orwell has written the book."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "question": "Which of the following sentences uses the correct form of the verb?",
+          "correctAnswer": "They have gone to the store.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. They gone to the store.",
+              "type": "radio",
+              "value": "They gone to the store."
+            },
+            {
+              "id": "2",
+              "label": "B. They have gone to the store.",
+              "type": "radio",
+              "value": "They have gone to the store."
+            },
+            {
+              "id": "3",
+              "label": "C. They has gone to the store.",
+              "type": "radio",
+              "value": "They has gone to the store."
+            },
+            {
+              "id": "4",
+              "label": "D. They are gone to the store.",
+              "type": "radio",
+              "value": "They are gone to the store."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "question": "What is the correct past form of the verb 'to go'?",
+          "correctAnswer": "went",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. goed",
+              "type": "radio",
+              "value": "goed"
+            },
+            {
+              "id": "2",
+              "label": "B. gone",
+              "type": "radio",
+              "value": "gone"
+            },
+            {
+              "id": "3",
+              "label": "C. went",
+              "type": "radio",
+              "value": "went"
+            },
+            {
+              "id": "4",
+              "label": "D. goes",
+              "type": "radio",
+              "value": "goes"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "question": "Which sentence is in the future tense?",
+          "correctAnswer": "She will travel to Paris next year.",
+          "options": [
+            {
+              "id": "1",
+              "label": "A. She travels to Paris next year.",
+              "type": "radio",
+              "value": "She travels to Paris next year."
+            },
+            {
+              "id": "2",
+              "label": "B. She travel to Paris next year.",
+              "type": "radio",
+              "value": "She travel to Paris next year."
+            },
+            {
+              "id": "3",
+              "label": "C. She will travel to Paris next year.",
+              "type": "radio",
+              "value": "She will travel to Paris next year."
+            },
+            {
+              "id": "4",
+              "label": "D. She traveled to Paris next year.",
+              "type": "radio",
+              "value": "She traveled to Paris next year."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "progress": [
+    {
+      "id": 1,
+      "userId": 1,
+      "userData": [
+        {
+          "exerciseId": "1",
+          "progressPercentage": 100,
+          "exerciseAmount": 5,
+          "completedExerciseAmount": 5
+        },
+        {
+          "exerciseId": "4",
+          "progressPercentage": 67,
+          "exerciseAmount": 3,
+          "completedExerciseAmount": 2
+        },
+        {
+          "exerciseId": "3",
+          "progressPercentage": 100,
+          "exerciseAmount": 3,
+          "completedExerciseAmount": 3
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "userData": [
+        {
+          "exerciseId": "1",
+          "progressPercentage": 100,
+          "exerciseAmount": 5,
+          "completedExerciseAmount": 5
+        },
+        {
+          "exerciseId": "2",
+          "progressPercentage": 33,
+          "exerciseAmount": 3,
+          "completedExerciseAmount": 1
+        },
+        {
+          "exerciseId": "8",
+          "progressPercentage": 20,
+          "exerciseAmount": 5,
+          "completedExerciseAmount": 1
+        }
+      ]
+    }
+  ],
+  "newresult": [
+    {
+      "userId": 1,
+      "id": "6ac09522-71ac-443f-aafa-fecc76a3edf1",
+      "exercises": [
+        {
+          "exerciseId": "1",
+          "exerciseResults": [
+            {
+              "questionId": 1,
+              "userId": 1,
+              "selectedAnswer": "She has study English for three years.",
+              "selectedAnswerId": "1",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "2"
+            },
+            {
+              "questionId": 2,
+              "userId": 1,
+              "selectedAnswer": "George Orwell wrote the book.",
+              "selectedAnswerId": "1",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "3"
+            },
+            {
+              "questionId": 3,
+              "userId": 1,
+              "selectedAnswer": "They have gone to the store.",
+              "selectedAnswerId": "2",
+              "isCorrect": true,
+              "completed": true,
+              "correctOptionId": "2"
+            },
+            {
+              "questionId": 4,
+              "userId": 1,
+              "selectedAnswer": "went",
+              "selectedAnswerId": "3",
+              "isCorrect": true,
+              "completed": true,
+              "correctOptionId": "3"
+            },
+            {
+              "questionId": 5,
+              "userId": 1,
+              "selectedAnswer": "She travel to Paris next year.",
+              "selectedAnswerId": "2",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userId": 1,
+      "id": "fdff6a80-6ac8-42d1-89b6-9e052fa67a2d",
+      "exercises": [
+        {
+          "exerciseId": "4",
+          "exerciseResults": [
+            {
+              "questionId": 1,
+              "userId": 1,
+              "selectedAnswer": "angry",
+              "selectedAnswerId": "2",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "1"
+            },
+            {
+              "questionId": 2,
+              "userId": 1,
+              "selectedAnswer": "lazy",
+              "selectedAnswerId": "3",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userId": 2,
+      "id": "66162ac4-7b62-4b5e-ab04-32598246efb5",
+      "exercises": [
+        {
+          "exerciseId": "1",
+          "exerciseResults": [
+            {
+              "questionId": 1,
+              "userId": 2,
+              "selectedAnswer": "She has study English for three years.",
+              "selectedAnswerId": "1",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "2"
+            },
+            {
+              "questionId": 2,
+              "userId": 2,
+              "selectedAnswer": "George Orwell wrote the book.",
+              "selectedAnswerId": "1",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "3"
+            },
+            {
+              "questionId": 3,
+              "userId": 2,
+              "selectedAnswer": "They gone to the store.",
+              "selectedAnswerId": "1",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "2"
+            },
+            {
+              "questionId": 4,
+              "userId": 2,
+              "selectedAnswer": "went",
+              "selectedAnswerId": "3",
+              "isCorrect": true,
+              "completed": true,
+              "correctOptionId": "3"
+            },
+            {
+              "questionId": 5,
+              "userId": 2,
+              "selectedAnswer": "She will travel to Paris next year.",
+              "selectedAnswerId": "3",
+              "isCorrect": true,
+              "completed": true,
+              "correctOptionId": "3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userId": 2,
+      "id": "d3a03be7-312f-4098-862f-8619cee5cc47",
+      "exercises": [
+        {
+          "exerciseId": "2",
+          "exerciseResults": [
+            {
+              "questionId": 3,
+              "userId": 2,
+              "selectedAnswer": "get by",
+              "selectedAnswerId": "2",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userId": 2,
+      "id": "cc419630-a2b9-4340-8657-047506a9098b",
+      "exercises": [
+        {
+          "exerciseId": "8",
+          "exerciseResults": [
+            {
+              "questionId": 1,
+              "userId": 2,
+              "selectedAnswer": "I am watching TV when she called.",
+              "selectedAnswerId": "4",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userId": 1,
+      "id": "d0b2b71e-8267-4539-bed2-71b53063976d",
+      "exercises": [
+        {
+          "exerciseId": "3",
+          "exerciseResults": [
+            {
+              "questionId": 1,
+              "userId": 1,
+              "selectedAnswer": "If water boiled, it would turn into steam.",
+              "selectedAnswerId": "3",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "1"
+            },
+            {
+              "questionId": 2,
+              "userId": 1,
+              "selectedAnswer": "If it rains, we will stay indoors.",
+              "selectedAnswerId": "1",
+              "isCorrect": true,
+              "completed": true,
+              "correctOptionId": "1"
+            },
+            {
+              "questionId": 3,
+              "userId": 1,
+              "selectedAnswer": "If I had a car, I drove to work.",
+              "selectedAnswerId": "3",
+              "isCorrect": false,
+              "completed": true,
+              "correctOptionId": "1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "wordsCache": {
+    "animals": [
+      {
+        "word": "gliderine",
+        "translation": "глайдерин",
+        "example": "The gliderine glides silently over the forest canopy.",
+        "type": "animals"
+      },
+      {
+        "word": "spiketail",
+        "translation": "спайк-тейл",
+        "example": "A spiketail can be spotted darting through the dunes at dusk.",
+        "type": "animals"
+      },
+      {
+        "word": "marblenoon",
+        "translation": "марклнун",
+        "example": "Marblenoon turtles nest on the rocky shores of the island.",
+        "type": "animals"
+      },
+      {
+        "word": "silvershade",
+        "translation": "силвершейд",
+        "example": "The silvershade fox is known for its shimmering coat in moonlight.",
+        "type": "animals"
+      },
+      {
+        "word": "thornbeak",
+        "translation": "торнбек",
+        "example": "A thornbeak pecked at the bark, searching for insects beneath.",
+        "type": "animals"
+      }
+    ],
+    "food": [
+      {
+        "word": "saporb",
+        "translation": "сапорб",
+        "example": "She sprinkled saporb over the roast for extra depth.",
+        "type": "food"
+      },
+      {
+        "word": "crunchlet",
+        "translation": "кранчлет",
+        "example": "The party platter featured spicy crunchlets.",
+        "type": "food"
+      },
+      {
+        "word": "umamix",
+        "translation": "умамикс",
+        "example": "He drizzled umamix on the grilled vegetables.",
+        "type": "food"
+      },
+      {
+        "word": "flavoraid",
+        "translation": "флаворад",
+        "example": "A glass of cold flavoraid refreshed the hikers.",
+        "type": "food"
+      },
+      {
+        "word": "veggifusion",
+        "translation": "веггифьюжн",
+        "example": "The chef's signature veggifusion was both colorful and nutritious.",
+        "type": "food"
+      },
+      {
+        "word": "crunchette",
+        "translation": "кранчетт",
+        "example": "The crunchette made a satisfying sound when I bit into it.",
+        "type": "food"
+      },
+      {
+        "word": "sizzletop",
+        "translation": "сиззлетоп",
+        "example": "She served the steak with a crispy sizzletop that crackled on the plate.",
+        "type": "food"
+      },
+      {
+        "word": "flavorbloom",
+        "translation": "флейворблум",
+        "example": "The soup's flavorbloom became more intense as it simmered.",
+        "type": "food"
+      },
+      {
+        "word": "snacklet",
+        "translation": "снэклет",
+        "example": "I grabbed a handful of snacklet chips for a quick bite between meetings.",
+        "type": "food"
+      },
+      {
+        "word": "zestberry",
+        "translation": "зестберри",
+        "example": "The dessert was topped with fresh zestberry slices, adding a tangy twist.",
+        "type": "food"
+      }
+    ],
+    "travel": [
+      {
+        "word": "globetrek",
+        "translation": "путешествие по миру",
+        "example": "After months of planning, we finally embarked on a globetrek across continents.",
+        "type": "travel"
+      },
+      {
+        "word": "skywayze",
+        "translation": "небесный путь",
+        "example": "The new airline advertises a skywayze that makes long-haul flights feel like a breeze.",
+        "type": "travel"
+      },
+      {
+        "word": "terraquest",
+        "translation": "земное приключение",
+        "example": "Their terraquest through the Andes included remote villages and hidden waterfalls.",
+        "type": "travel"
+      },
+      {
+        "word": "voyagelink",
+        "translation": "путевой союз",
+        "example": "The app creates a voyagelink between travelers with similar itineraries for shared experiences.",
+        "type": "travel"
+      },
+      {
+        "word": "nomadify",
+        "translation": "стать кочевником",
+        "example": "He decided to nomadify his lifestyle by working remotely while exploring new cities every month.",
+        "type": "travel"
+      }
+    ]
+  }
+}
