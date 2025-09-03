@@ -134,6 +134,118 @@ server.get("/profile/:id", async (req, res) => {
   }
 });
 
+server.get("/articles", async (req, res) => {
+  try {
+    let { _limit, _page, _sort, _order, q, type, _expand } = req.query;
+
+    _limit = parseInt(_limit) || 10;
+    _page = parseInt(_page) || 1;
+    _order = (_order || "desc").toLowerCase();
+
+    let query = supabase.from("articles").select(
+      `
+        *,
+        user:users(id, username, avatar),
+        blocks:article_blocks(*)
+      `,
+      { count: "exact" }
+    );
+
+    if (q) {
+      query = query.ilike("title", `%${q}%`);
+    }
+
+    if (type && type !== "ALL") {
+      query = query.contains("type", [type]);
+    }
+
+    if (_sort) {
+      query = query.order(_sort, { ascending: _order === "asc" });
+    }
+
+    const from = (_page - 1) * _limit;
+    const to = from + _limit - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    res.set("X-Total-Count", count || 0);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.get("/exercises/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Получаем упражнение
+    const { data: exercise, error: exerciseError } = await supabase
+      .from("exercises")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (exerciseError || !exercise) {
+      return res.status(404).json({ message: "Exercise not found" });
+    }
+
+    // 2. Получаем вопросы с их опциями
+    const { data: questions, error: questionsError } = await supabase
+      .from("questions")
+      .select(
+        `
+        *,
+        options:question_options(*)   -- в Supabase можно вложенно
+      `
+      )
+      .eq("exercise_id", id)
+      .order("id", { ascending: true });
+
+    if (questionsError)
+      return res.status(500).json({ message: questionsError.message });
+
+    // 3. Возвращаем полностью структуру
+    res.json({
+      ...exercise,
+      questions,
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.get("/exercises", async (req, res) => {
+  try {
+    let { _limit, _page, type } = req.query;
+
+    _limit = parseInt(_limit) || 10;
+    _page = parseInt(_page) || 1;
+
+    let query = supabase.from("exercises").select("*", { count: "exact" });
+
+    if (type && type !== "ALL") {
+      query = query.contains("type", [type]);
+    }
+
+    const from = (_page - 1) * _limit;
+    const to = from + _limit - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    res.set("X-Total-Count", count || 0);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
 // === HuggingFace / OpenAI route ===
 server.post("/generate-words", async (req, res) => {
   try {
