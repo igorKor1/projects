@@ -1,14 +1,19 @@
-const fs = require("fs");
 const path = require("path");
 const jsonServer = require("json-server");
 const multer = require("multer");
 const cors = require("cors");
 const { OpenAI } = require("openai");
+const { createClient } = require("@supabase/supabase-js");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const HF_TOKEN = process.env.HF_TOKEN;
-if (!HF_TOKEN) {
-  console.error("HF_TOKEN is not set in .env!");
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!HF_TOKEN || !SUPABASE_URL || !SUPABASE_KEY) {
+  console.error(
+    "Missing ENV vars: HF_TOKEN / SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY"
+  );
   process.exit(1);
 }
 
@@ -17,16 +22,15 @@ const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1",
 });
 
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const server = jsonServer.create();
-const router = jsonServer.router(path.resolve(__dirname, "../db.json"));
 server.use(jsonServer.defaults());
 server.use(jsonServer.bodyParser);
 server.use(cors());
 
-// Uploads folder
+// === Uploads (локально, на Vercel — не будет работать, надо будет s3 / supabase storage) ===
 const uploadsDir = path.resolve(__dirname, "../uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) =>
@@ -34,71 +38,76 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Delay middleware
+// === Delay middleware ===
 server.use(async (req, res, next) => {
   await new Promise((r) => setTimeout(r, 800));
   next();
 });
 
-// Serve uploads
-server.use("/uploads", require("express").static(uploadsDir));
-
 // === Auth & Profile routes ===
-server.post("/login", (req, res) => {
+server.post("/login", async (req, res) => {
   try {
     const { username, password, email } = req.body;
-    const db = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, "../db.json"), "UTF-8")
-    );
-    const users = db.users || [];
-    const user = email
-      ? users.find((u) => u.email === email && u.password === password)
-      : users.find((u) => u.username === username && u.password === password);
 
-    if (user) return res.json(user);
-    return res.status(403).json({ message: "User not found" });
+    let query = supabase
+      .from("users")
+      .select("*")
+      .eq("password", password)
+      .limit(1);
+
+    if (email) query = query.eq("email", email);
+    else query = query.eq("username", username);
+
+    const { data: user, error } = await query.single();
+
+    if (error || !user)
+      return res.status(403).json({ message: "User not found" });
+    return res.json(user);
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }
 });
 
-server.post("/register", (req, res) => {
+server.post("/register", async (req, res) => {
   try {
     const { username, password, email } = req.body;
     if (!username || !password || !email)
       return res.status(400).json({ message: "All fields are required" });
 
-    const dbPath = path.resolve(__dirname, "../db.json");
-    const db = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
-    db.users = db.users || [];
+    // check existing
+    const { data: existing, error: checkError } = await supabase
+      .from("users")
+      .select("id")
+      .or(`username.eq.${username},email.eq.${email}`)
+      .limit(1);
 
-    if (db.users.find((u) => u.username === username))
-      return res.status(400).json({ message: "Username exists" });
-    if (db.users.find((u) => u.email === email))
-      return res.status(400).json({ message: "Email exists" });
+    if (checkError)
+      return res.status(500).json({ message: checkError.message });
+    if (existing.length)
+      return res.status(400).json({ message: "User exists" });
 
-    const id = db.users.length ? Math.max(...db.users.map((u) => u.id)) + 1 : 1;
-    const newUser = {
-      id,
-      username,
-      password,
-      email,
-      avatar: `https://i.pravatar.cc/150?u=${username}`,
-    };
-    db.users.push(newUser);
+    // insert user
+    const { data: user, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          username,
+          password,
+          email,
+          avatar: `https://i.pravatar.cc/150?u=${username}`,
+        },
+      ])
+      .select()
+      .single();
 
-    db.profile = db.profile || [];
-    db.profile.push({
-      id: id.toString(),
-      username,
-      name: "",
-      lastName: "",
-      age: null,
-      avatar: newUser.avatar,
-    });
+    if (error) return res.status(500).json({ message: error.message });
 
-    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), "utf-8");
-    return res.status(201).json(newUser);
+    // create profile
+    await supabase
+      .from("profile")
+      .insert([{ id: user.id, username, avatar: user.avatar }]);
+
+    res.status(201).json(user);
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }
@@ -110,14 +119,16 @@ server.use((req, res, next) => {
   next();
 });
 
-server.get("/profile/:id", (req, res) => {
+server.get("/profile/:id", async (req, res) => {
   try {
-    const db = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, "../db.json"), "utf-8")
-    );
-    const profile = db.profile.find((p) => p.id === req.params.id);
-    if (!profile) return res.status(404).json({ message: "Not found" });
-    res.json(profile);
+    const { data, error } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("id", req.params.id)
+      .single();
+
+    if (error) return res.status(404).json({ message: "Not found" });
+    res.json(data);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -146,29 +157,27 @@ server.post("/generate-words", async (req, res) => {
     if (!match) return res.status(500).json({ message: "No JSON array found" });
 
     let parsed = JSON.parse(match[0]);
-    const dbPath = path.resolve(__dirname, "../db.json");
-    const db = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
-    db.wordsCache = db.wordsCache || {};
-    db.wordsCache[topic] = (db.wordsCache[topic] || []).concat(parsed);
-    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), "utf-8");
-    res.json(db.wordsCache[topic]);
+
+    // save in supabase
+    await supabase.from("wordsCache").insert([{ topic, words: parsed }]);
+
+    res.json(parsed);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
 });
 
-server.get("/wordsCache", (req, res) => {
+server.get("/wordsCache", async (req, res) => {
   try {
-    const db = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, "../db.json"), "utf-8")
-    );
-    res.json(db.wordsCache || []);
+    const { data, error } = await supabase.from("wordsCache").select("*");
+    if (error) return res.status(500).json({ message: error.message });
+    res.json(data || []);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
 });
 
-// === Upload avatar ===
+// === Upload avatar (локально работает, на Vercel нужен Supabase Storage) ===
 server.post("/upload-avatar", upload.single("avatar"), (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -179,13 +188,10 @@ server.post("/upload-avatar", upload.single("avatar"), (req, res) => {
   }
 });
 
-// Use json-server router as fallback
-server.use(router);
-
-// === Локальный запуск ===
 if (process.env.NODE_ENV !== "production") {
-  server.listen(8000, () => {
-    console.log("Server running on http://localhost:8000");
+  const PORT = process.env.PORT || 8000;
+  server.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
