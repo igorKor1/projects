@@ -178,6 +178,32 @@ server.get("/articles", async (req, res) => {
   }
 });
 
+server.get("/articles/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: article, error } = await supabase
+      .from("articles")
+      .select(
+        `
+          *,
+          user:users(id, username, avatar),
+          blocks:article_blocks(*)
+        `
+      )
+      .eq("id", id)
+      .single();
+
+    if (error || !article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    res.json(article);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
 server.get("/exercises/:id", async (req, res) => {
   try {
     const { id } = req.params;
