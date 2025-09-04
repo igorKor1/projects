@@ -4,6 +4,9 @@ const multer = require("multer");
 const cors = require("cors");
 const { OpenAI } = require("openai");
 const { createClient } = require("@supabase/supabase-js");
+
+const { v4: uuidv4 } = require("uuid");
+
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const HF_TOKEN = process.env.HF_TOKEN;
@@ -178,32 +181,6 @@ server.get("/articles", async (req, res) => {
   }
 });
 
-server.get("/articles/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const { data: article, error } = await supabase
-      .from("articles")
-      .select(
-        `
-          *,
-          user:users(id, username, avatar),
-          blocks:article_blocks(*)
-        `
-      )
-      .eq("id", id)
-      .single();
-
-    if (error || !article) {
-      return res.status(404).json({ message: "Article not found" });
-    }
-
-    res.json(article);
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-});
-
 server.get("/exercises/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -244,6 +221,116 @@ server.get("/exercises/:id", async (req, res) => {
   }
 });
 
+server.get("/articles/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: article, error } = await supabase
+      .from("articles")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error || !article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    res.json(article);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.get("/recommendations", async (req, res) => {
+  try {
+    const { _limit } = req.query;
+    const limit = parseInt(_limit) || 10;
+
+    const { data, error } = await supabase
+      .from("articles")
+      .select("id, img, subtitle, title")
+      .order("created_at", { ascending: false })
+      .range(0, limit - 1);
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    res.json(data || []);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.get("/comments", async (req, res) => {
+  try {
+    const { articleId } = req.query;
+
+    if (!articleId) {
+      return res.status(400).json({ message: "articleId is required" });
+    }
+
+    const { data, error } = await supabase
+      .from("comments")
+      .select(
+        `
+        *,
+        user:users(id, username, avatar)
+      `
+      )
+      .eq("articleid", articleId)
+      .order("created_at", { ascending: true });
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    res.json(data || []);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.post("/comments", async (req, res) => {
+  try {
+    const { text, articleId, userId } = req.body;
+
+    if (!text || !articleId) {
+      return res
+        .status(400)
+        .json({ message: "text and articleId are required" });
+    }
+
+    const { data, error } = await supabase
+      .from("comments")
+      .insert([
+        {
+          text,
+          articleid: articleId,
+          userid: userId || null,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    // подтягиваем user для фронта
+    const { data: commentWithUser, error: userError } = await supabase
+      .from("comments")
+      .select(
+        `
+        *,
+        user:users(id, username, avatar)
+      `
+      )
+      .eq("id", data.id)
+      .single();
+
+    if (userError) return res.status(500).json({ message: userError.message });
+
+    res.status(201).json(commentWithUser);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
 server.get("/exercises", async (req, res) => {
   try {
     let { _limit, _page, type } = req.query;
@@ -272,7 +359,262 @@ server.get("/exercises", async (req, res) => {
   }
 });
 
-// === HuggingFace / OpenAI route ===
+server.post("/exercise-results", async (req, res) => {
+  try {
+    const { user_id, exercises, result_uuid } = req.body;
+    if (!user_id || !exercises)
+      return res.status(400).json({ message: "Missing required fields" });
+
+    // Получаем существующие результаты
+    const { data: existing, error: fetchError } = await supabase
+      .from("exercise_results")
+      .select("*")
+      .eq("user_id", user_id)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116")
+      return res.status(500).json({ message: fetchError.message });
+
+    if (existing) {
+      // Объединяем старые и новые упражнения, фильтруя дубликаты по exercise_id + question_id
+      const updatedExercises = [...existing.exercises];
+
+      exercises.forEach((ex) => {
+        ex.exerciseResults.forEach((resItem) => {
+          const exists = updatedExercises
+            .find((e) => e.exercise_id == ex.exercise_id)
+            ?.exerciseResults.some((r) => r.question_id == resItem.question_id);
+          if (!exists) {
+            const idx = updatedExercises.findIndex(
+              (e) => e.exercise_id == ex.exercise_id
+            );
+            if (idx !== -1) updatedExercises[idx].exerciseResults.push(resItem);
+            else updatedExercises.push(ex);
+          }
+        });
+      });
+
+      const { data, error } = await supabase
+        .from("exercise_results")
+        .update({
+          exercises: updatedExercises,
+          result_uuid: result_uuid || existing.result_uuid,
+        })
+        .eq("user_id", user_id)
+        .select()
+        .single();
+
+      if (error) return res.status(500).json({ message: error.message });
+      return res.json(data);
+    } else {
+      const { data, error } = await supabase
+        .from("exercise_results")
+        .insert([{ user_id, exercises, result_uuid: result_uuid || uuidv4() }])
+        .select()
+        .single();
+
+      if (error) return res.status(500).json({ message: error.message });
+      return res.status(201).json(data);
+    }
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.put("/exercise-results/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { exercises, result_uuid } = req.body;
+
+    if (!exercises) {
+      return res.status(400).json({ message: "Missing exercises data" });
+    }
+
+    // Обновляем запись по id
+    const { data, error } = await supabase
+      .from("exercise_results")
+      .update({ exercises, result_uuid })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    // Если exercises хранится как JSON-строка, можно парсить
+    const parsedExercises = Array.isArray(data.exercises)
+      ? data.exercises
+      : JSON.parse(data.exercises);
+
+    res.json({
+      ...data,
+      exercises: parsedExercises,
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.get("/exercise-results", async (req, res) => {
+  try {
+    const { userId, exerciseId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+
+    // достаём все результаты пользователя
+    const { data, error } = await supabase
+      .from("exercise_results")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    let filtered = (data || []).filter((d) => {
+      // Преобразуем строку в JSON, если нужно
+      const exercises = Array.isArray(d.exercises)
+        ? d.exercises
+        : JSON.parse(d.exercises);
+
+      // Фильтруем по exerciseId
+      return (
+        !exerciseId || exercises.some((ex) => ex.exercise_id == exerciseId)
+      );
+    });
+
+    // Отдаём пустой массив, если нет совпадений
+    res.json(filtered);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.post("/progress", async (req, res) => {
+  try {
+    const { user_id, user_data } = req.body;
+    if (!user_id || !user_data)
+      return res.status(400).json({ message: "Missing required fields" });
+
+    const { data: existing, error: fetchError } = await supabase
+      .from("progress")
+      .select("*")
+      .eq("user_id", user_id)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116")
+      return res.status(500).json({ message: fetchError.message });
+
+    if (existing) {
+      const updatedUserData = [...existing.user_data];
+
+      user_data.forEach((newEx) => {
+        const idx = updatedUserData.findIndex(
+          (e) => e.exercise_id == newEx.exercise_id
+        );
+        if (idx !== -1) {
+          // обновляем существующую запись
+          updatedUserData[idx] = { ...updatedUserData[idx], ...newEx };
+        } else {
+          updatedUserData.push(newEx);
+        }
+      });
+
+      const { data, error } = await supabase
+        .from("progress")
+        .update({ user_data: updatedUserData })
+        .eq("user_id", user_id)
+        .select()
+        .single();
+
+      if (error) return res.status(500).json({ message: error.message });
+      return res.json(data);
+    } else {
+      const { data, error } = await supabase
+        .from("progress")
+        .insert([{ user_id, user_data }])
+        .select()
+        .single();
+
+      if (error) return res.status(500).json({ message: error.message });
+      return res.status(201).json(data);
+    }
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.put("/progress/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id, user_data } = req.body;
+
+    if (!user_id || !user_data) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const { data, error } = await supabase
+      .from("progress")
+      .update({ user_id, user_data })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    // camelCase для фронта
+    res.json({
+      ...data,
+      id: data.id,
+      userId: data.user_id,
+      userData: data.user_data,
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.get("/progress", async (req, res) => {
+  try {
+    const { userId, exerciseId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+
+    const { data, error } = await supabase
+      .from("progress")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    let filtered = (data || []).map((d) => {
+      const user_data = Array.isArray(d.user_data)
+        ? d.user_data
+        : JSON.parse(d.user_data);
+
+      return {
+        ...d,
+        user_data,
+      };
+    });
+
+    if (exerciseId) {
+      filtered = filtered.filter((d) =>
+        d.user_data.some((ex) => ex.exercise_id == exerciseId)
+      );
+    }
+
+    res.json(filtered);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
 server.post("/generate-words", async (req, res) => {
   try {
     const { topic } = req.body;
