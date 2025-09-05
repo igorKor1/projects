@@ -74,23 +74,32 @@ server.post("/login", async (req, res) => {
 server.post("/register", async (req, res) => {
   try {
     const { username, password, email } = req.body;
-    if (!username || !password || !email)
-      return res.status(400).json({ message: "All fields are required" });
 
-    // check existing
-    const { data: existing, error: checkError } = await supabase
+    if (!username || !password || !email) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const { data: existingUsername, error: usernameError } = await supabase
       .from("users")
       .select("id")
-      .or(`username.eq.${username},email.eq.${email}`)
+      .eq("username", username)
       .limit(1);
+    if (usernameError)
+      return res.status(500).json({ message: usernameError.message });
+    if (existingUsername.length > 0)
+      return res.status(400).json({ message: "Username already exists" });
 
-    if (checkError)
-      return res.status(500).json({ message: checkError.message });
-    if (existing.length)
-      return res.status(400).json({ message: "User exists" });
+    const { data: existingEmail, error: emailError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email)
+      .limit(1);
+    if (emailError)
+      return res.status(500).json({ message: emailError.message });
+    if (existingEmail.length > 0)
+      return res.status(400).json({ message: "Email already exists" });
 
-    // insert user
-    const { data: user, error } = await supabase
+    const { data: user, error: insertError } = await supabase
       .from("users")
       .insert([
         {
@@ -102,17 +111,30 @@ server.post("/register", async (req, res) => {
       ])
       .select()
       .single();
+    if (insertError)
+      return res.status(500).json({ message: insertError.message });
 
-    if (error) return res.status(500).json({ message: error.message });
+    const { error: profileError } = await supabase.from("profile").insert([
+      {
+        user_id: user.id,
+        name: username,
+        lastname: "",
+        age: null,
+        currency: "USD",
+        country: "",
+        city: "",
+        avatar: user.avatar,
+        primarycolor: "#00bfff",
+        secondarycolor: "#ff6347",
+      },
+    ]);
 
-    // create profile
-    await supabase
-      .from("profile")
-      .insert([{ id: user.id, username, avatar: user.avatar }]);
+    if (profileError)
+      return res.status(500).json({ message: profileError.message });
 
     res.status(201).json(user);
   } catch (e) {
-    return res.status(500).json({ message: e.message });
+    res.status(500).json({ message: e.message });
   }
 });
 
@@ -122,16 +144,29 @@ server.use((req, res, next) => {
   next();
 });
 
-server.get("/profile/:id", async (req, res) => {
+server.get("/profile/:userId", async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const { data: profile, error } = await supabase
       .from("profile")
       .select("*")
-      .eq("id", req.params.id)
+      .eq("user_id", Number(userId))
       .single();
 
-    if (error) return res.status(404).json({ message: "Not found" });
-    res.json(data);
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.json(profile);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -139,7 +174,7 @@ server.get("/profile/:id", async (req, res) => {
 
 server.get("/articles", async (req, res) => {
   try {
-    let { _limit, _page, _sort, _order, q, type, _expand } = req.query;
+    let { _limit, _page, _sort, _order, q, type } = req.query;
 
     _limit = parseInt(_limit) || 10;
     _page = parseInt(_page) || 1;
@@ -227,7 +262,13 @@ server.get("/articles/:id", async (req, res) => {
 
     const { data: article, error } = await supabase
       .from("articles")
-      .select("*")
+      .select(
+        `
+        *,
+        user:users(id, username, avatar),
+        blocks:article_blocks(*)
+      `
+      )
       .eq("id", id)
       .single();
 
