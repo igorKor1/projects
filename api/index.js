@@ -4,6 +4,18 @@ const multer = require("multer");
 const cors = require("cors");
 const { OpenAI } = require("openai");
 const { createClient } = require("@supabase/supabase-js");
+const storageMemory = multer.memoryStorage();
+const uploadMemory = multer({
+  storage: storageMemory,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    // можно запретить не-изображения
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Only images are allowed"), false);
+    }
+    cb(null, true);
+  },
+});
 
 const { v4: uuidv4 } = require("uuid");
 
@@ -31,15 +43,6 @@ const server = jsonServer.create();
 server.use(jsonServer.defaults());
 server.use(jsonServer.bodyParser);
 server.use(cors());
-
-// === Uploads (локально, на Vercel — не будет работать, надо будет s3 / supabase storage) ===
-const uploadsDir = path.resolve(__dirname, "../uploads");
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) =>
-    cb(null, `${Date.now()}${path.extname(file.originalname)}`),
-});
-const upload = multer({ storage });
 
 // === Delay middleware ===
 server.use(async (req, res, next) => {
@@ -167,6 +170,36 @@ server.get("/profile/:userId", async (req, res) => {
     }
 
     res.json(profile);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.put("/profile/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updates = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const { data, error } = await supabase
+      .from("profile")
+      .update(updates)
+      .eq("user_id", Number(userId))
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    if (!data) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.json(data);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -698,16 +731,61 @@ server.get("/wordsCache", async (req, res) => {
   }
 });
 
-// === Upload avatar (локально работает, на Vercel нужен Supabase Storage) ===
-server.post("/upload-avatar", upload.single("avatar"), (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-    const url = `/uploads/${req.file.filename}`;
-    res.json({ url });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
+server.post(
+  "/upload-avatar",
+  uploadMemory.single("avatar"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { userId } = req.body;
+      const filename = `avatars/${userId || "anon"}-${Date.now()}-${
+        req.file.originalname
+      }`;
+
+      // Загружаем файл в приватный bucket Supabase
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filename, req.file.buffer, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: req.file.mimetype,
+        });
+
+      if (uploadError) {
+        console.error("Supabase upload error:", uploadError);
+        return res.status(500).json({ message: uploadError.message });
+      }
+
+      // Создаём signed URL (доступен 1 час)
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(filename, 60 * 60);
+
+      if (signedError) {
+        console.error("Supabase signed URL error:", signedError);
+        return res.status(500).json({ message: signedError.message });
+      }
+
+      const signedUrl = signedData?.signedUrl || signedData?.signedURL;
+
+      // Обновляем профиль в БД с signed URL
+      if (userId) {
+        await supabase
+          .from("profile")
+          .update({ avatar: signedUrl })
+          .eq("user_id", Number(userId));
+      }
+
+      res.json({ url: signedUrl });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: e.message });
+    }
   }
-});
+);
 
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 8000;
