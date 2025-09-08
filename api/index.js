@@ -37,6 +37,14 @@ const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1",
 });
 
+function getPublicImageUrl(bucket, path) {
+  if (!path) return null;
+
+  const cleanPath = path.replace(/^images\//, "").replace(/^\/+/, "");
+
+  return `https://aiqxwhlrhvyyrthdhkov.supabase.co/storage/v1/object/public/${bucket}/${cleanPath}`;
+}
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const server = jsonServer.create();
@@ -213,37 +221,32 @@ server.get("/articles", async (req, res) => {
     _page = parseInt(_page) || 1;
     _order = (_order || "desc").toLowerCase();
 
-    let query = supabase.from("articles").select(
-      `
-        *,
-        user:users(id, username, avatar),
-        blocks:article_blocks(*)
-      `,
-      { count: "exact" }
-    );
-
-    if (q) {
-      query = query.ilike("title", `%${q}%`);
-    }
-
-    if (type && type !== "ALL") {
-      query = query.contains("type", [type]);
-    }
-
-    if (_sort) {
-      query = query.order(_sort, { ascending: _order === "asc" });
-    }
+    const filters = (query) => {
+      if (q) query = query.ilike("title", `%${q}%`);
+      if (type && type !== "ALL") query = query.contains("type", [type]);
+      return query;
+    };
 
     const from = (_page - 1) * _limit;
-    const to = from + _limit - 1;
+    const to = from + _limit;
+    let query = supabase
+      .from("articles")
+      .select(`*, user:users(id, username, avatar), blocks:article_blocks(*)`);
+    query = filters(query);
+
+    if (_sort) query = query.order(_sort, { ascending: _order === "asc" });
     query = query.range(from, to);
 
-    const { data, error, count } = await query;
-
+    const { data, error } = await query;
     if (error) return res.status(500).json({ message: error.message });
 
-    res.set("X-Total-Count", count || 0);
-    res.json(data);
+    const hasNextPage = data.length > _limit;
+    const articles = data.slice(0, _limit).map((article) => ({
+      ...article,
+      img: getPublicImageUrl("article-images", article.img),
+    }));
+
+    res.json({ data: articles, hasNextPage });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -253,7 +256,6 @@ server.get("/exercises/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Получаем упражнение
     const { data: exercise, error: exerciseError } = await supabase
       .from("exercises")
       .select("*")
@@ -264,13 +266,12 @@ server.get("/exercises/:id", async (req, res) => {
       return res.status(404).json({ message: "Exercise not found" });
     }
 
-    // 2. Получаем вопросы с их опциями
     const { data: questions, error: questionsError } = await supabase
       .from("questions")
       .select(
         `
         *,
-        options:question_options(*)   -- в Supabase можно вложенно
+        options:question_options(*)
       `
       )
       .eq("exercise_id", id)
@@ -279,9 +280,9 @@ server.get("/exercises/:id", async (req, res) => {
     if (questionsError)
       return res.status(500).json({ message: questionsError.message });
 
-    // 3. Возвращаем полностью структуру
     res.json({
       ...exercise,
+      image: getPublicImageUrl("exercise-images", exercise.image),
       questions,
     });
   } catch (e) {
@@ -309,7 +310,10 @@ server.get("/articles/:id", async (req, res) => {
       return res.status(404).json({ message: "Article not found" });
     }
 
-    res.json(article);
+    res.json({
+      ...article,
+      img: getPublicImageUrl("article-images", article.img),
+    });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -426,8 +430,16 @@ server.get("/exercises", async (req, res) => {
 
     if (error) return res.status(500).json({ message: error.message });
 
+    // подставляем URL
+    const exercises = data.map((ex) => ({
+      ...ex,
+      image: getPublicImageUrl("exercise-images", ex.image),
+    }));
+
+    console.log(exercises, "exercises");
+
     res.set("X-Total-Count", count || 0);
-    res.json(data);
+    res.json(exercises);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
