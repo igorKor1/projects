@@ -310,9 +310,19 @@ server.get("/articles/:id", async (req, res) => {
       return res.status(404).json({ message: "Article not found" });
     }
 
+    const articleImgUrl = getPublicImageUrl("article-images", article.img);
+
+    const blocksWithPublicSrc = article.blocks.map((block) => ({
+      ...block,
+      src: block.src
+        ? getPublicImageUrl("articl-block-images", block.src)
+        : null,
+    }));
+
     res.json({
       ...article,
-      img: getPublicImageUrl("article-images", article.img),
+      img: articleImgUrl,
+      blocks: blocksWithPublicSrc,
     });
   } catch (e) {
     res.status(500).json({ message: e.message });
@@ -701,17 +711,73 @@ server.get("/progress", async (req, res) => {
   }
 });
 
-server.post("/generate-words", async (req, res) => {
+server.get("/words", async (req, res) => {
   try {
-    const { topic } = req.body;
-    if (!topic) return res.status(400).json({ message: "Topic required" });
+    const { topic, userId } = req.query;
+    if (!userId) return res.status(400).json({ message: "userId required" });
+
+    let query = supabase
+      .from("words")
+      .select(
+        `
+        id,
+        word,
+        translation,
+        example,
+        type,
+        topic:topics(name)
+      `
+      )
+      .eq("user_id", userId);
+
+    if (topic) query = query.eq("topics.name", topic);
+
+    const { data, error } = await query;
+    if (error) return res.status(500).json({ message: error.message });
+
+    const groups = [];
+    const groupMap = {};
+
+    data.forEach((word) => {
+      const topicName = word.topic?.name || "unknown";
+      if (!groupMap[topicName]) groupMap[topicName] = [];
+      groupMap[topicName].push(word);
+    });
+
+    for (const [topicName, items] of Object.entries(groupMap)) {
+      groups.push({ id: topicName, items });
+    }
+
+    res.json(groups);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.post("/words", async (req, res) => {
+  try {
+    const { user_id, topic } = req.body;
+    if (!user_id || !topic)
+      return res.status(400).json({ message: "user_id and topic required" });
+
+    console.log(`Generating words for topic: ${topic}`);
 
     const completion = await client.chat.completions.create({
       model: "openai/gpt-oss-120b:nscale",
       messages: [
         {
           role: "user",
-          content: `Generate 5 new words on topic "${topic}" in JSON array only.`,
+          content: `
+Generate 5 new words on the topic "${topic}".
+Provide ONLY a JSON array of objects.
+Each object must have:
+  "word": string,
+  "translation": string (Russian),
+  "example": string (English),
+  "type": string "${topic}"
+No extra text or comments.
+Ensure valid JSON with double quotes.
+          `,
         },
       ],
       max_tokens: 900,
@@ -720,25 +786,139 @@ server.post("/generate-words", async (req, res) => {
 
     let content = completion.choices?.[0]?.message?.content || "";
     const match = content.match(/\[.*\]/s);
-    if (!match) return res.status(500).json({ message: "No JSON array found" });
+    if (!match)
+      return res
+        .status(500)
+        .json({ message: "No JSON array found in model response" });
 
     let parsed = JSON.parse(match[0]);
 
-    // save in supabase
-    await supabase.from("wordsCache").insert([{ topic, words: parsed }]);
+    let { data: topicData } = await supabase
+      .from("topics")
+      .select("id")
+      .eq("name", topic)
+      .eq("user_id", user_id)
+      .single();
 
-    res.json(parsed);
+    if (!topicData) {
+      const { data: newTopic } = await supabase
+        .from("topics")
+        .insert([{ name: topic, user_id }])
+        .select()
+        .single();
+      topicData = newTopic;
+    }
+
+    const wordPayload = parsed.map((w) => ({
+      word: w.word,
+      translation: w.translation,
+      example: w.example,
+      type: w.type,
+      topic_id: topicData.id,
+      user_id,
+    }));
+
+    const { data: insertedWords, error } = await supabase
+      .from("words")
+      .insert(wordPayload)
+      .select();
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    res.json([{ id: topic, items: insertedWords }]);
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: e.message });
   }
 });
 
-server.get("/wordsCache", async (req, res) => {
+server.put("/words", async (req, res) => {
   try {
-    const { data, error } = await supabase.from("wordsCache").select("*");
+    const { user_id, topic } = req.body;
+    if (!user_id || !topic)
+      return res.status(400).json({ message: "user_id and topic required" });
+
+    let { data: topicData } = await supabase
+      .from("topics")
+      .select("id")
+      .eq("name", topic)
+      .eq("user_id", user_id)
+      .single();
+
+    if (!topicData) {
+      const { data: newTopic } = await supabase
+        .from("topics")
+        .insert([{ name: topic, user_id }])
+        .select()
+        .single();
+      topicData = newTopic;
+    }
+
+    const completion = await client.chat.completions.create({
+      model: "moonshotai/Kimi-K2-Instruct-0905",
+      provider: "together",
+      messages: [
+        {
+          role: "user",
+          content: `
+Generate 5 new words on the topic "${topic}".
+Provide ONLY a JSON array of objects.
+Each object must have:
+  "word": string,
+  "translation": string (Russian),
+  "example": string (English),
+  "type": string "${topic}"
+No extra text or comments.
+Ensure valid JSON with double quotes.
+          `,
+        },
+      ],
+      max_tokens: 900,
+      temperature: 0.9,
+    });
+
+    const content = completion.choices?.[0]?.message?.content || "";
+    const match = content.match(/\[.*\]/s);
+    if (!match)
+      return res
+        .status(500)
+        .json({ message: "No JSON array found in model response" });
+
+    const parsed = JSON.parse(match[0]);
+
+    const { data: existingWords } = await supabase
+      .from("words")
+      .select("word")
+      .eq("user_id", user_id)
+      .eq("topic_id", topicData.id);
+
+    const existingSet = new Set(existingWords?.map((w) => w.word));
+
+    const newWords = parsed.filter((w) => !existingSet.has(w.word));
+
+    if (newWords.length === 0) {
+      return res.json({ message: "No new words to add", items: [] });
+    }
+
+    const wordPayload = newWords.map((w) => ({
+      word: w.word,
+      translation: w.translation,
+      example: w.example,
+      type: w.type,
+      topic_id: topicData.id,
+      user_id,
+    }));
+
+    const { data: insertedWords, error } = await supabase
+      .from("words")
+      .insert(wordPayload)
+      .select();
+
     if (error) return res.status(500).json({ message: error.message });
-    res.json(data || []);
+
+    res.json([{ id: topic, items: insertedWords }]);
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: e.message });
   }
 });
@@ -757,7 +937,6 @@ server.post(
         req.file.originalname
       }`;
 
-      // Загружаем файл в приватный bucket Supabase
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filename, req.file.buffer, {
@@ -771,27 +950,20 @@ server.post(
         return res.status(500).json({ message: uploadError.message });
       }
 
-      // Создаём signed URL (доступен 1 час)
-      const { data: signedData, error: signedError } = await supabase.storage
+      const { data: publicUrlData } = supabase.storage
         .from("avatars")
-        .createSignedUrl(filename, 60 * 60);
+        .getPublicUrl(filename);
 
-      if (signedError) {
-        console.error("Supabase signed URL error:", signedError);
-        return res.status(500).json({ message: signedError.message });
-      }
+      const publicUrl = publicUrlData.publicUrl;
 
-      const signedUrl = signedData?.signedUrl || signedData?.signedURL;
-
-      // Обновляем профиль в БД с signed URL
       if (userId) {
         await supabase
           .from("profile")
-          .update({ avatar: signedUrl })
+          .update({ avatar: publicUrl })
           .eq("user_id", Number(userId));
       }
 
-      res.json({ url: signedUrl });
+      res.json({ url: publicUrl });
     } catch (e) {
       console.error(e);
       res.status(500).json({ message: e.message });
@@ -806,5 +978,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// === Экспорт для Vercel ===
+// for Vercel
 module.exports = server;
