@@ -756,11 +756,11 @@ server.get("/words", async (req, res) => {
 
 server.post("/words", async (req, res) => {
   try {
-    const { user_id, topic } = req.body;
-    if (!user_id || !topic)
-      return res.status(400).json({ message: "user_id and topic required" });
-
-    console.log(`Generating words for topic: ${topic}`);
+    const { user_id, topic, digit } = req.body;
+    if (!user_id || !topic || !digit)
+      return res
+        .status(400)
+        .json({ message: "user_id, topic and digit required" });
 
     const completion = await client.chat.completions.create({
       model: "openai/gpt-oss-120b:nscale",
@@ -768,16 +768,18 @@ server.post("/words", async (req, res) => {
         {
           role: "user",
           content: `
-Generate 5 new words on the topic "${topic}".
-Provide ONLY a JSON array of objects.
-Each object must have:
-  "word": string,
+Generate exactly ${digit} real English words related to the topic "${topic}".
+Rules:
+- Use only real words from Cambridge Dictionary (no invented words).
+- Provide ONLY a JSON array of objects.
+- Each object must include:
+  "word": string (English),
   "translation": string (Russian),
-  "example": string (English),
-  "type": string "${topic}"
-No extra text or comments.
-Ensure valid JSON with double quotes.
-          `,
+  "example": string (English sentence),
+  "type": string ("${topic}")
+- Ensure valid JSON with double quotes.
+- Do not add any explanations or extra text outside the JSON.
+    `,
         },
       ],
       max_tokens: 900,
@@ -834,9 +836,11 @@ Ensure valid JSON with double quotes.
 
 server.put("/words", async (req, res) => {
   try {
-    const { user_id, topic } = req.body;
-    if (!user_id || !topic)
-      return res.status(400).json({ message: "user_id and topic required" });
+    const { user_id, topic, digit } = req.body;
+    if (!user_id || !topic || !digit)
+      return res
+        .status(400)
+        .json({ message: "user_id, topic and digit required" });
 
     let { data: topicData } = await supabase
       .from("topics")
@@ -861,16 +865,18 @@ server.put("/words", async (req, res) => {
         {
           role: "user",
           content: `
-Generate 5 new words on the topic "${topic}".
-Provide ONLY a JSON array of objects.
-Each object must have:
-  "word": string,
+Generate exactly ${digit} real English words related to the topic "${topic}".
+Rules:
+- Use only real words from Cambridge Dictionary (no invented words).
+- Provide ONLY a JSON array of objects.
+- Each object must include:
+  "word": string (English),
   "translation": string (Russian),
-  "example": string (English),
-  "type": string "${topic}"
-No extra text or comments.
-Ensure valid JSON with double quotes.
-          `,
+  "example": string (English sentence),
+  "type": string ("${topic}")
+- Ensure valid JSON with double quotes.
+- Do not add any explanations or extra text outside the JSON.
+    `,
         },
       ],
       max_tokens: 900,
