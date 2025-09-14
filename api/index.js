@@ -1,15 +1,18 @@
 const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const jsonServer = require("json-server");
 const multer = require("multer");
 const cors = require("cors");
 const { OpenAI } = require("openai");
-const { createClient } = require("@supabase/supabase-js");
+const { supabase } = require("../lib/supabase");
+const { calcStreak } = require("../utils/calcStreak");
+const { recalcLearnedPercent } = require("../utils/recalcLearnedPercent");
+
 const storageMemory = multer.memoryStorage();
 const uploadMemory = multer({
   storage: storageMemory,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    // можно запретить не-изображения
     if (!file.mimetype.startsWith("image/")) {
       return cb(new Error("Only images are allowed"), false);
     }
@@ -18,8 +21,6 @@ const uploadMemory = multer({
 });
 
 const { v4: uuidv4 } = require("uuid");
-
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const HF_TOKEN = process.env.HF_TOKEN;
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -45,20 +46,14 @@ function getPublicImageUrl(bucket, path) {
   return `https://aiqxwhlrhvyyrthdhkov.supabase.co/storage/v1/object/public/${bucket}/${cleanPath}`;
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const DEFAULT_AVATAR_URL =
+  "https://i.pinimg.com/1200x/3e/96/18/3e96181466ad44946c3af75fb71e7788.jpg";
 
 const server = jsonServer.create();
 server.use(jsonServer.defaults());
 server.use(jsonServer.bodyParser);
 server.use(cors());
 
-// === Delay middleware ===
-server.use(async (req, res, next) => {
-  await new Promise((r) => setTimeout(r, 800));
-  next();
-});
-
-// === Auth & Profile routes ===
 server.post("/login", async (req, res) => {
   try {
     const { username, password, email } = req.body;
@@ -112,14 +107,7 @@ server.post("/register", async (req, res) => {
 
     const { data: user, error: insertError } = await supabase
       .from("users")
-      .insert([
-        {
-          username,
-          password,
-          email,
-          avatar: `https://i.pravatar.cc/150?u=${username}`,
-        },
-      ])
+      .insert([{ username, password, email, avatar: DEFAULT_AVATAR_URL }])
       .select()
       .single();
     if (insertError)
@@ -139,9 +127,14 @@ server.post("/register", async (req, res) => {
         secondarycolor: "#ff6347",
       },
     ]);
-
     if (profileError)
       return res.status(500).json({ message: profileError.message });
+
+    const { error: streakError } = await supabase
+      .from("user_streak")
+      .insert([{ user_id: user.id, streak: 0, last_activity: null }]);
+    if (streakError)
+      console.error("Error creating initial streak:", streakError.message);
 
     res.status(201).json(user);
   } catch (e) {
@@ -426,30 +419,30 @@ server.get("/exercises", async (req, res) => {
     _limit = parseInt(_limit) || 10;
     _page = parseInt(_page) || 1;
 
+    const from = (_page - 1) * _limit;
+    const to = from + _limit;
+
     let query = supabase.from("exercises").select("*", { count: "exact" });
 
     if (type && type !== "ALL") {
       query = query.contains("type", [type]);
     }
 
-    const from = (_page - 1) * _limit;
-    const to = from + _limit - 1;
     query = query.range(from, to);
 
     const { data, error, count } = await query;
 
     if (error) return res.status(500).json({ message: error.message });
 
-    // подставляем URL
-    const exercises = data.map((ex) => ({
+    const hasNextPage = data.length > _limit;
+
+    const exercises = data.slice(0, _limit).map((ex) => ({
       ...ex,
       image: getPublicImageUrl("exercise-images", ex.image),
     }));
 
-    console.log(exercises, "exercises");
-
     res.set("X-Total-Count", count || 0);
-    res.json(exercises);
+    res.json({ data: exercises, hasNextPage });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -461,7 +454,8 @@ server.post("/exercise-results", async (req, res) => {
     if (!user_id || !exercises)
       return res.status(400).json({ message: "Missing required fields" });
 
-    // Получаем существующие результаты
+    const today = new Date().toISOString().split("T")[0];
+
     const { data: existing, error: fetchError } = await supabase
       .from("exercise_results")
       .select("*")
@@ -471,50 +465,106 @@ server.post("/exercise-results", async (req, res) => {
     if (fetchError && fetchError.code !== "PGRST116")
       return res.status(500).json({ message: fetchError.message });
 
+    let updatedExercises = [];
+
     if (existing) {
-      // Объединяем старые и новые упражнения, фильтруя дубликаты по exercise_id + question_id
-      const updatedExercises = [...existing.exercises];
+      updatedExercises = [...existing.exercises];
 
-      exercises.forEach((ex) => {
-        ex.exerciseResults.forEach((resItem) => {
-          const exists = updatedExercises
-            .find((e) => e.exercise_id == ex.exercise_id)
-            ?.exerciseResults.some((r) => r.question_id == resItem.question_id);
-          if (!exists) {
-            const idx = updatedExercises.findIndex(
-              (e) => e.exercise_id == ex.exercise_id
+      for (let i = 0; i < exercises.length; i++) {
+        const ex = exercises[i];
+
+        for (let j = 0; j < ex.exerciseResults.length; j++) {
+          const resItem = ex.exerciseResults[j];
+          const exerciseIndex = updatedExercises.findIndex(
+            (e) => e.exercise_id == ex.exercise_id
+          );
+
+          if (exerciseIndex !== -1) {
+            const exists = updatedExercises[exerciseIndex].exerciseResults.some(
+              (r) => r.question_id == resItem.question_id
             );
-            if (idx !== -1) updatedExercises[idx].exerciseResults.push(resItem);
-            else updatedExercises.push(ex);
-          }
-        });
-      });
 
-      const { data, error } = await supabase
+            if (!exists) {
+              updatedExercises[exerciseIndex].exerciseResults.push({
+                ...resItem,
+                date: today,
+              });
+            }
+          } else {
+            updatedExercises.push({
+              ...ex,
+              exerciseResults: ex.exerciseResults.map((r) => ({
+                ...r,
+                date: today,
+              })),
+            });
+          }
+        }
+      }
+
+      await supabase
         .from("exercise_results")
         .update({
           exercises: updatedExercises,
           result_uuid: result_uuid || existing.result_uuid,
         })
-        .eq("user_id", user_id)
-        .select()
-        .single();
-
-      if (error) return res.status(500).json({ message: error.message });
-      return res.json(data);
+        .eq("user_id", user_id);
     } else {
-      const { data, error } = await supabase
-        .from("exercise_results")
-        .insert([{ user_id, exercises, result_uuid: result_uuid || uuidv4() }])
-        .select()
-        .single();
+      updatedExercises = exercises.map((ex) => ({
+        ...ex,
+        exerciseResults: ex.exerciseResults.map((r) => ({
+          ...r,
+          date: today,
+        })),
+      }));
 
-      if (error) return res.status(500).json({ message: error.message });
-      return res.status(201).json(data);
+      await supabase.from("exercise_results").insert([
+        {
+          user_id,
+          exercises: updatedExercises,
+          result_uuid: result_uuid || uuidv4(),
+        },
+      ]);
     }
+
+    const streak = calcStreak(updatedExercises, today);
+
+    const { data: streakData } = await supabase
+      .from("user_streak")
+      .select("*")
+      .eq("user_id", user_id)
+      .single();
+
+    if (streakData) {
+      await supabase
+        .from("user_streak")
+        .update({ streak, last_activity: today, updated_at: new Date() })
+        .eq("user_id", user_id);
+    } else {
+      await supabase
+        .from("user_streak")
+        .insert({ user_id, streak, last_activity: today });
+    }
+
+    res.status(201).json({ message: "Saved", streak });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
+});
+
+server.get("/streak/:userId", async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId, "userId");
+
+  const { data, error } = await supabase
+    .from("user_streak")
+    .select("*")
+    .eq("user_id", Number(userId))
+    .single();
+
+  if (error) return res.status(500).json({ message: error.message });
+
+  res.json(data);
 });
 
 server.put("/exercise-results/:id", async (req, res) => {
@@ -526,7 +576,6 @@ server.put("/exercise-results/:id", async (req, res) => {
       return res.status(400).json({ message: "Missing exercises data" });
     }
 
-    // Обновляем запись по id
     const { data, error } = await supabase
       .from("exercise_results")
       .update({ exercises, result_uuid })
@@ -725,7 +774,8 @@ server.get("/words", async (req, res) => {
         translation,
         example,
         type,
-        topic:topics(name)
+        topic:topics(name),
+        isLearned
       `
       )
       .eq("user_id", userId);
@@ -754,6 +804,45 @@ server.get("/words", async (req, res) => {
   }
 });
 
+server.put("/words/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id, isLearned } = req.body;
+
+    if (!user_id || typeof isLearned !== "boolean") {
+      return res
+        .status(400)
+        .json({ message: "user_id and isLearned required" });
+    }
+
+    const { data: updatedWord, error: updateError } = await supabase
+      .from("words")
+      .update({ isLearned })
+      .eq("id", id)
+      .eq("user_id", user_id)
+      .select()
+      .single();
+
+    if (updateError)
+      return res.status(500).json({ message: updateError.message });
+
+    const learned_words_percent = await recalcLearnedPercent(user_id, supabase);
+
+    const { error: userUpdateError } = await supabase
+      .from("users")
+      .update({ learned_words_percent })
+      .eq("id", user_id);
+
+    if (userUpdateError)
+      return res.status(500).json({ message: userUpdateError.message });
+
+    res.json({ ...updatedWord, learned_words_percent });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: e.message });
+  }
+});
+
 server.post("/words", async (req, res) => {
   try {
     const { user_id, topic, digit } = req.body;
@@ -762,6 +851,24 @@ server.post("/words", async (req, res) => {
         .status(400)
         .json({ message: "user_id, topic and digit required" });
 
+    // Get or create topic
+    let { data: topicData } = await supabase
+      .from("topics")
+      .select("id")
+      .eq("name", topic)
+      .eq("user_id", user_id)
+      .single();
+
+    if (!topicData) {
+      const { data: newTopic } = await supabase
+        .from("topics")
+        .insert([{ name: topic, user_id }])
+        .select()
+        .single();
+      topicData = newTopic;
+    }
+
+    // Generate words using AI
     const completion = await client.chat.completions.create({
       model: "openai/gpt-oss-120b:nscale",
       messages: [
@@ -770,113 +877,12 @@ server.post("/words", async (req, res) => {
           content: `
 Generate exactly ${digit} real English words related to the topic "${topic}".
 Rules:
-- Use only real words from Cambridge Dictionary (no invented words).
-- Provide ONLY a JSON array of objects.
-- Each object must include:
-  "word": string (English),
-  "translation": string (Russian),
-  "example": string (English sentence),
-  "type": string ("${topic}")
+- Use only real words from Cambridge Dictionary.
+- Provide ONLY a JSON array of objects with:
+  "word", "translation", "example", "type"
 - Ensure valid JSON with double quotes.
-- Do not add any explanations or extra text outside the JSON.
-    `,
-        },
-      ],
-      max_tokens: 900,
-      temperature: 0.9,
-    });
-
-    let content = completion.choices?.[0]?.message?.content || "";
-    const match = content.match(/\[.*\]/s);
-    if (!match)
-      return res
-        .status(500)
-        .json({ message: "No JSON array found in model response" });
-
-    let parsed = JSON.parse(match[0]);
-
-    let { data: topicData } = await supabase
-      .from("topics")
-      .select("id")
-      .eq("name", topic)
-      .eq("user_id", user_id)
-      .single();
-
-    if (!topicData) {
-      const { data: newTopic } = await supabase
-        .from("topics")
-        .insert([{ name: topic, user_id }])
-        .select()
-        .single();
-      topicData = newTopic;
-    }
-
-    const wordPayload = parsed.map((w) => ({
-      word: w.word,
-      translation: w.translation,
-      example: w.example,
-      type: w.type,
-      topic_id: topicData.id,
-      user_id,
-    }));
-
-    const { data: insertedWords, error } = await supabase
-      .from("words")
-      .insert(wordPayload)
-      .select();
-
-    if (error) return res.status(500).json({ message: error.message });
-
-    res.json([{ id: topic, items: insertedWords }]);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: e.message });
-  }
-});
-
-server.put("/words", async (req, res) => {
-  try {
-    const { user_id, topic, digit } = req.body;
-    if (!user_id || !topic || !digit)
-      return res
-        .status(400)
-        .json({ message: "user_id, topic and digit required" });
-
-    let { data: topicData } = await supabase
-      .from("topics")
-      .select("id")
-      .eq("name", topic)
-      .eq("user_id", user_id)
-      .single();
-
-    if (!topicData) {
-      const { data: newTopic } = await supabase
-        .from("topics")
-        .insert([{ name: topic, user_id }])
-        .select()
-        .single();
-      topicData = newTopic;
-    }
-
-    const completion = await client.chat.completions.create({
-      model: "moonshotai/Kimi-K2-Instruct-0905",
-      provider: "together",
-      messages: [
-        {
-          role: "user",
-          content: `
-Generate exactly ${digit} real English words related to the topic "${topic}".
-Rules:
-- Use only real words from Cambridge Dictionary (no invented words).
-- Provide ONLY a JSON array of objects.
-- Each object must include:
-  "word": string (English),
-  "translation": string (Russian),
-  "example": string (English sentence),
-  "type": string ("${topic}")
-- Ensure valid JSON with double quotes.
-- Do not add any explanations or extra text outside the JSON.
-    `,
+- Do not add explanations or extra text outside the JSON.
+        `,
         },
       ],
       max_tokens: 900,
@@ -892,6 +898,7 @@ Rules:
 
     const parsed = JSON.parse(match[0]);
 
+    // Filter out existing words
     const { data: existingWords } = await supabase
       .from("words")
       .select("word")
@@ -899,13 +906,26 @@ Rules:
       .eq("topic_id", topicData.id);
 
     const existingSet = new Set(existingWords?.map((w) => w.word));
-
     const newWords = parsed.filter((w) => !existingSet.has(w.word));
 
     if (newWords.length === 0) {
-      return res.json({ message: "No new words to add", items: [] });
+      const learned_words_percent = await recalcLearnedPercent(
+        user_id,
+        supabase
+      );
+      await supabase
+        .from("users")
+        .update({ learned_words_percent })
+        .eq("id", user_id);
+
+      return res.json({
+        message: "No new words to add",
+        items: [],
+        learned_words_percent,
+      });
     }
 
+    // Insert new words
     const wordPayload = newWords.map((w) => ({
       word: w.word,
       translation: w.translation,
@@ -913,6 +933,7 @@ Rules:
       type: w.type,
       topic_id: topicData.id,
       user_id,
+      isLearned: false,
     }));
 
     const { data: insertedWords, error } = await supabase
@@ -922,7 +943,141 @@ Rules:
 
     if (error) return res.status(500).json({ message: error.message });
 
-    res.json([{ id: topic, items: insertedWords }]);
+    // Recalculate learned words percent
+    const learned_words_percent = await recalcLearnedPercent(user_id, supabase);
+    await supabase
+      .from("users")
+      .update({ learned_words_percent })
+      .eq("id", user_id);
+
+    res.json({
+      topic_id: topicData.id,
+      items: insertedWords,
+      learned_words_percent,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: e.message });
+  }
+});
+
+server.put("/words", async (req, res) => {
+  try {
+    const { user_id, topic, digit } = req.body;
+    if (!user_id || !topic || !digit)
+      return res
+        .status(400)
+        .json({ message: "user_id, topic and digit required" });
+
+    // Get or create topic
+    let { data: topicData } = await supabase
+      .from("topics")
+      .select("id")
+      .eq("name", topic)
+      .eq("user_id", user_id)
+      .single();
+
+    if (!topicData) {
+      const { data: newTopic } = await supabase
+        .from("topics")
+        .insert([{ name: topic, user_id }])
+        .select()
+        .single();
+      topicData = newTopic;
+    }
+
+    // Generate words using AI
+    const completion = await client.chat.completions.create({
+      model: "moonshotai/Kimi-K2-Instruct-0905",
+      provider: "together",
+      messages: [
+        {
+          role: "user",
+          content: `
+Generate exactly ${digit} real English words related to the topic "${topic}".
+Rules:
+- Use only real words from Cambridge Dictionary.
+- Provide ONLY a JSON array of objects.
+- Each object must include:
+  "word": string,
+  "translation": string,
+  "example": string,
+  "type": string ("${topic}")
+- Ensure valid JSON with double quotes.
+- Do not add any explanations or extra text outside the JSON.
+        `,
+        },
+      ],
+      max_tokens: 900,
+      temperature: 0.9,
+    });
+
+    const content = completion.choices?.[0]?.message?.content || "";
+    const match = content.match(/\[.*\]/s);
+    if (!match)
+      return res
+        .status(500)
+        .json({ message: "No JSON array found in model response" });
+
+    const parsed = JSON.parse(match[0]);
+
+    // Filter out existing words
+    const { data: existingWords } = await supabase
+      .from("words")
+      .select("word")
+      .eq("user_id", user_id)
+      .eq("topic_id", topicData.id);
+
+    const existingSet = new Set(existingWords?.map((w) => w.word));
+    const newWords = parsed.filter((w) => !existingSet.has(w.word));
+
+    if (newWords.length === 0) {
+      const learned_words_percent = await recalcLearnedPercent(
+        user_id,
+        supabase
+      );
+      await supabase
+        .from("users")
+        .update({ learned_words_percent })
+        .eq("id", user_id);
+
+      return res.json({
+        message: "No new words to add",
+        items: [],
+        learned_words_percent,
+      });
+    }
+
+    // Insert new words
+    const wordPayload = newWords.map((w) => ({
+      word: w.word,
+      translation: w.translation,
+      example: w.example,
+      type: w.type,
+      topic_id: topicData.id,
+      user_id,
+      isLearned: false,
+    }));
+
+    const { data: insertedWords, error } = await supabase
+      .from("words")
+      .insert(wordPayload)
+      .select();
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    // Recalculate learned words percent
+    const learned_words_percent = await recalcLearnedPercent(user_id, supabase);
+    await supabase
+      .from("users")
+      .update({ learned_words_percent })
+      .eq("id", user_id);
+
+    res.json({
+      topic_id: topicData.id,
+      items: insertedWords,
+      learned_words_percent,
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: e.message });
@@ -977,7 +1132,7 @@ server.post(
   }
 );
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
   const PORT = process.env.PORT || 8000;
   server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
