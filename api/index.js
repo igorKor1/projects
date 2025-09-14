@@ -7,6 +7,9 @@ const { OpenAI } = require("openai");
 const { supabase } = require("../lib/supabase");
 const { calcStreak } = require("../utils/calcStreak");
 const { recalcLearnedPercent } = require("../utils/recalcLearnedPercent");
+const {
+  recalcCompletedExercisesPercent,
+} = require("../utils/recalcCompletedExercisesPercent");
 
 const storageMemory = multer.memoryStorage();
 const uploadMemory = multer({
@@ -448,6 +451,21 @@ server.get("/exercises", async (req, res) => {
   }
 });
 
+server.get("/streak/:userId", async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId, "userId");
+
+  const { data, error } = await supabase
+    .from("user_streak")
+    .select("*")
+    .eq("user_id", Number(userId))
+    .single();
+
+  if (error) return res.status(500).json({ message: error.message });
+
+  res.json(data);
+});
+
 server.post("/exercise-results", async (req, res) => {
   try {
     const { user_id, exercises, result_uuid } = req.body;
@@ -470,37 +488,33 @@ server.post("/exercise-results", async (req, res) => {
     if (existing) {
       updatedExercises = [...existing.exercises];
 
-      for (let i = 0; i < exercises.length; i++) {
-        const ex = exercises[i];
+      exercises.forEach((ex) => {
+        const exerciseIndex = updatedExercises.findIndex(
+          (e) => e.exercise_id == ex.exercise_id
+        );
 
-        for (let j = 0; j < ex.exerciseResults.length; j++) {
-          const resItem = ex.exerciseResults[j];
-          const exerciseIndex = updatedExercises.findIndex(
-            (e) => e.exercise_id == ex.exercise_id
-          );
-
-          if (exerciseIndex !== -1) {
+        if (exerciseIndex !== -1) {
+          ex.exerciseResults.forEach((resItem) => {
             const exists = updatedExercises[exerciseIndex].exerciseResults.some(
               (r) => r.question_id == resItem.question_id
             );
-
             if (!exists) {
               updatedExercises[exerciseIndex].exerciseResults.push({
                 ...resItem,
                 date: today,
               });
             }
-          } else {
-            updatedExercises.push({
-              ...ex,
-              exerciseResults: ex.exerciseResults.map((r) => ({
-                ...r,
-                date: today,
-              })),
-            });
-          }
+          });
+        } else {
+          updatedExercises.push({
+            ...ex,
+            exerciseResults: ex.exerciseResults.map((r) => ({
+              ...r,
+              date: today,
+            })),
+          });
         }
-      }
+      });
 
       await supabase
         .from("exercise_results")
@@ -546,35 +560,25 @@ server.post("/exercise-results", async (req, res) => {
         .insert({ user_id, streak, last_activity: today });
     }
 
-    res.status(201).json({ message: "Saved", streak });
+    const { completedCount, percent } = await recalcCompletedExercisesPercent(
+      user_id,
+      supabase
+    );
+
+    res.status(201).json({ message: "Saved", streak, completedCount, percent });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
 });
 
-server.get("/streak/:userId", async (req, res) => {
-  const { userId } = req.params;
-  console.log(userId, "userId");
-
-  const { data, error } = await supabase
-    .from("user_streak")
-    .select("*")
-    .eq("user_id", Number(userId))
-    .single();
-
-  if (error) return res.status(500).json({ message: error.message });
-
-  res.json(data);
-});
-
+// PUT /exercise-results/:id
 server.put("/exercise-results/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { exercises, result_uuid } = req.body;
 
-    if (!exercises) {
+    if (!exercises)
       return res.status(400).json({ message: "Missing exercises data" });
-    }
 
     const { data, error } = await supabase
       .from("exercise_results")
@@ -585,14 +589,20 @@ server.put("/exercise-results/:id", async (req, res) => {
 
     if (error) return res.status(500).json({ message: error.message });
 
-    // Если exercises хранится как JSON-строка, можно парсить
     const parsedExercises = Array.isArray(data.exercises)
       ? data.exercises
       : JSON.parse(data.exercises);
 
+    const { completedCount, percent } = await recalcCompletedExercisesPercent(
+      data.user_id,
+      supabase
+    );
+
     res.json({
       ...data,
       exercises: parsedExercises,
+      completedCount,
+      percent,
     });
   } catch (e) {
     res.status(500).json({ message: e.message });
